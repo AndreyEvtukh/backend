@@ -18,6 +18,10 @@ spring:
         format_sql: true
     show-sql: true
 
+  web:
+    servlet:
+      path: /api
+
   graphql:
     graphiql:
       enabled: true   # UI для ручного тестирования запросов: http://localhost:8080/graphiql
