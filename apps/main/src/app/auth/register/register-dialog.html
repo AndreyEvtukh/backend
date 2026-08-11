@@ -1,0 +1,131 @@
+<section
+    class="bg-dark-2 flex flex-col items-center h-full px-8 pt-8 pb-4 overflow-hidden rounded-md border border-dark-3 justify-center items-center">
+    <div class="flex flex-col items-center justify-center w-full gap-8">
+        <div class="flex flex-row absolute top-0 left-0 items-center pt-4 pl-4 cursor-pointer" (click)="goLogin()">
+            <mat-icon [svgIcon]="ICONS.ArrowR" class="!h-4 aspect-square color-dark-9 transform rotate-180"></mat-icon>
+            <span>Back</span>
+        </div>
+
+        <div class="w-16 h-16 aspect-square rounded-full bg-bronze-30 flex flex-col justify-center items-center">
+            <mat-icon [svgIcon]="ICONS.Login" class="color-bronze"></mat-icon>
+        </div>
+
+        <h2 class="uppercase font-medium">Register</h2>
+
+        <form class="flex flex-col justify-center gap-0 max-w-2xs w-full" [formGroup]="form" autocomplete="off"
+              [class.waiting]="waiting()">
+            <mat-form-field class="w-full relative z-10">
+                <mat-label>{{ "User Name" }}</mat-label>
+                <input matInput
+                       id="{{FORM_FIELD.USERNAME}}"
+                       type="text"
+                       formControlName="{{FORM_FIELD.USERNAME}}"
+                       autocomplete="new-email"
+                       class="!border !border-b-dark-9 !p-2 !rounded-sm"
+                       (blur)="doBlurredInput(FORM_FIELD.USERNAME)"
+                       required/>
+                @if (form.controls[FORM_FIELD.USERNAME].invalid) {
+                    <mat-error class="error">
+                        @if (form.controls[FORM_FIELD.USERNAME].errors?.['required']) {
+                            <small> {{ "User name" }} {{ "is required" }} </small>
+                        }
+                    </mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field class="w-full relative z-10">
+                <mat-label>{{ "Email" }}</mat-label>
+                <input matInput
+                       id="{{FORM_FIELD.EMAIL}}"
+                       type="email"
+                       formControlName="{{FORM_FIELD.EMAIL}}"
+                       autocomplete="new-email"
+                       class="!border !border-b-dark-9 !p-2 !rounded-sm"
+                       (blur)="doBlurredInput(FORM_FIELD.EMAIL)"
+                       required/>
+                @if (form.controls[FORM_FIELD.EMAIL].invalid) {
+                    <mat-error class="error">
+                        @if (form.controls[FORM_FIELD.EMAIL].errors?.['required']) {
+                            <small> {{ "Email" }} {{ "is required" }} </small>
+                        }
+                        @if (emailIsInvalid() && !form.controls[FORM_FIELD.EMAIL].errors?.['required']) {
+                            <small> {{ "Email is Invalid" }} </small>
+                        }
+                    </mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field class="w-full relative z-10 relative flex items-center justify-end">
+                <mat-label>{{ "Password" }}</mat-label>
+                <div class="flex flex-row items-center gap-3">
+                    <input matInput
+                           id="{{FORM_FIELD.PASSWORD}}"
+                           type="{{showPassword ? 'text' : 'password'}}"
+                           formControlName="{{FORM_FIELD.PASSWORD}}"
+                           autocomplete="new-password"
+                           class="!border !border-b-dark-9 !p-2 !rounded-sm"
+                           (blur)="doBlurredInput(FORM_FIELD.PASSWORD)"
+                           required/>
+                    <mat-icon [svgIcon]="showPassword ? ICONS.EYE_OFF : ICONS.EYE_ON"
+                              class="cursor-pointer color-dark-9"
+                              (click)="showPassword = !showPassword"></mat-icon>
+                </div>
+                @if (form.controls[FORM_FIELD.PASSWORD].invalid && !form.controls[FORM_FIELD.PASSWORD].errors?.['matchPassword']) {
+                    <mat-error class="error mr-8">
+                        @if (form.controls[FORM_FIELD.PASSWORD].errors?.['required']) {
+                            <small> {{ "Password" }} {{ "is required" }} </small>
+                        }
+                        @if (form.controls[FORM_FIELD.PASSWORD].errors?.['whitespace'] && !form.controls[FORM_FIELD.PASSWORD]!.errors!['required']) {
+                            <small> {{ "Password" }} {{ "can't contain whitespace" }} </small>
+                        }
+                    </mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field class="w-full relative z-10">
+                <mat-label>{{ "Confirm Password" }}</mat-label>
+                <div class="flex flex-row items-center gap-3">
+                <input matInput
+                       id="{{FORM_FIELD.CONFIRM_PASSWORD}}"
+                       type="{{showConfirmPassword ? 'text' : 'password'}}"
+                       formControlName="{{FORM_FIELD.CONFIRM_PASSWORD}}"
+                       matchPassword="{{FORM_FIELD.PASSWORD}}"
+                       class="!border !border-b-dark-9 !p-2 !rounded-sm"
+                       (blur)="doBlurredInput(FORM_FIELD.CONFIRM_PASSWORD)"
+                       required/>
+                    <mat-icon [svgIcon]="showConfirmPassword ? ICONS.EYE_OFF : ICONS.EYE_ON"
+                              class="cursor-pointer color-dark-9"
+                              (click)="showConfirmPassword = !showConfirmPassword"></mat-icon>
+                </div>
+                @if (form.controls[FORM_FIELD.CONFIRM_PASSWORD].invalid) {
+                    <mat-error class="error mr-8">
+                        @if (form.controls[FORM_FIELD.CONFIRM_PASSWORD].errors?.['required']) {
+                            <small> {{ "Confirm password" }} {{ "is required" }} </small>
+                        }
+                        @if ((form.controls[FORM_FIELD.PASSWORD].errors?.['matchPassword'] || form.controls[FORM_FIELD.CONFIRM_PASSWORD].errors?.['matchPassword'])
+                        && !form.controls![FORM_FIELD.CONFIRM_PASSWORD]!.errors!['required']) {
+                            <small> {{ "Passwords do not match" }} </small>
+                        }
+                    </mat-error>
+                }
+            </mat-form-field>
+
+        </form>
+
+        <mat-dialog-actions align="end" class="w-full flex flex-col justify-center gap-6">
+            <button matButton="filled"
+                    class="uppercase max-w-2xs h-10 w-full rounded-sm p-2 font-medium cursor-pointer transition-all duration-200
+                         bg-bronze text-dark-2 border-bronze border
+                         disabled:bg-dark-3 disabled:text-dark-6 disabled:!border-dark-4
+                         disabled:cursor-not-allowed"
+                    [disabled]="form.invalid || isFormEmpty()"
+                    (click)="register()">
+                Register
+            </button>
+
+            <button matButton="filled" class="cursor-pointer" (click)="close()">
+                Cancel
+            </button>
+        </mat-dialog-actions>
+    </div>
+</section>

@@ -1,0 +1,294 @@
+@import 'tailwindcss';
+
+html {
+    scroll-behavior: smooth;
+    line-height: normal;
+}
+
+.mat-mdc-dialog-container,
+.mat-mdc-dialog-inner-container,
+.mat-mdc-dialog-surface,
+.mdc-dialog__container,
+.mdc-dialog__surface {
+    background: transparent !important;
+    padding: 0 !important;
+}
+
+.mat-mdc-dialog-surface {
+    box-shadow: rgba(0, 0, 0, 0.6) 0 11px 45px -2px !important
+}
+
+.cdk-overlay-dark-backdrop {
+    background: rgba(0, 0, 0, 0.6);
+}
+
+.mat-mdc-text-field-wrapper {
+    overflow: hidden;
+    margin: 0 !important;
+    padding: 0 !important;
+
+    .mdc-line-ripple {
+        display: none;
+    }
+}
+
+.mat-mdc-form-field-subscript-wrapper {
+    position: absolute;
+    bottom: 5px !important;
+    right: 0;
+    font-size: 12px;
+    font-family: "OpenSans-Medium", sans-serif;
+    width: auto;
+    height: 20px;
+
+    .mat-mdc-form-field-error-wrapper {
+        padding: 0;
+
+        .mat-mdc-form-field-error {
+            color: var(--color-dark-9) !important;
+            background: var(--color-red-700) !important;
+            padding: 0 0.5rem;
+            position: relative;
+            display: flex;
+
+            small {
+                white-space: nowrap;
+                line-height: 20px;
+            }
+        }
+    }
+}
+
+.mat-mdc-text-field-wrapper {
+    flex: none;
+    height: 100%;
+
+    .mat-mdc-form-field-flex {
+        height: 100%;
+        display: block;
+        width: 100%;
+
+        .mat-mdc-form-field-infix {
+            /*min-height: 50px;*/
+            /*padding-top: 20px;*/
+            /*padding-bottom: 6px;*/
+            /*height: 100%;*/
+            display: block;
+            /*flex: none;*/
+            width: 100%;
+
+            .mat-mdc-floating-label {
+                &.mdc-floating-label--float-above {
+                    transform: translateY(-42px) scale(0.75) !important;
+                }
+
+                top: 42px;
+                left: 8px;
+                /*z-index: 1;*/
+            }
+
+            textarea {
+                height: calc(100% - 30px);
+                padding-top: 0;
+                top: 24px;
+                right: -16px;
+                width: auto;
+                line-height: normal;
+                resize: none;
+
+                &.scrolled {
+                }
+            }
+        }
+    }
+}
+
+/* Light */
+/*@font-face {*/
+/*    font-family: "OpenSans-Light1";*/
+/*    src: url("./assets/fonts/light.ttf") format("woff");*/
+/*    font-style: normal;*/
+/*    font-display: swap;*/
+/*}*/
+
+/*!* Regular *!*/
+/*@font-face {*/
+/*    font-family: "OpenSans-Regular";*/
+/*    src: url("./assets/fonts/regular.ttf") format("woff");*/
+/*    font-style: normal;*/
+/*    font-display: swap;*/
+/*}*/
+
+/* Medium */
+@font-face {
+    font-family: "OpenSans-Medium";
+    src: url("./assets/fonts/medium.ttf") format("woff");
+    font-style: normal;
+    font-display: swap;
+}
+
+/*!* Bold *!*/
+/*@font-face {*/
+/*    font-family: "OpenSans-Bold";*/
+/*    src: url("./assets/fonts/bold.ttf") format("woff");*/
+/*    font-style: normal;*/
+/*    font-display: swap;*/
+/*}*/
+
+@theme {
+    --color-transparent: #000000000;
+    --color-black: #000;
+    --color-dark-1: #14161a;
+    --color-dark-2: #242529;
+    --color-dark-2-30: #24252966;
+    --color-dark-3: #2d2f33;
+    --color-dark-3-30: #2d2f3366;
+    --color-dark-4: #4d4d4d;
+    --color-dark-6: #666666;
+    --color-dark-7: #808080;
+    --color-dark-8: #999999;
+    --color-dark-9: #f2f2f2;
+    --color-white: #fff;
+    --color-bronze: #ffc166;
+    --color-bronze-30: #ffc16633;
+    --color-pink: #93278f;
+    --color-gold: #ffff00;
+
+    --width-1440: 1440px;
+
+    --text-10: 10px;
+    --text-14: 14px;
+    --text-18: 18px;
+    --text-24: 24px;
+    --text-36: 36px;
+
+    --shadow-banner: 0 0 50px rgb(0 0 0 / 0.25);
+    --shadow-sm: 0 0 30px rgb(0 0 0 / 0.6);
+}
+
+@utility gradient-fade-black {
+    background-image: linear-gradient(to top, #000 0%, transparent 100%);
+}
+
+@utility gradient-black-fade {
+    background-image: linear-gradient(to bottom, #000 0%, transparent 100%);
+}
+
+@utility bg-grad-fade-to-dark-3 {
+    background-image: linear-gradient(to right, var(--color-dark-3) 0%, transparent 100%);
+}
+
+@utility bg-grad-dark-3-to-fade {
+    background-image: linear-gradient(to left, var(--color-dark-3) 0%, transparent 100%);
+}
+
+@utility justify-center {
+    display: flex;
+    justify-content: center;
+}
+
+@utility align-center {
+    display: flex;
+    align-content: center;
+}
+
+@utility flex-center {
+    @apply justify-center align-center;
+}
+
+.max-w-1440 {
+    max-width: 1440px;
+}
+
+.h-15 {
+    height: 37.5rem;
+}
+
+.color-bronze {
+    color: var(--color-bronze);
+}
+
+.color-dark-4 {
+    color: var(--color-dark-4);
+}
+
+.color-dark-9 {
+    color: var(--color-dark-9);
+}
+
+.border-bronze {
+    border: 1px solid var(--color-bronze);
+}
+
+.underlined {
+    position: relative;
+
+    &:after {
+        content: "";
+        display: block;
+        position: absolute;
+        bottom: -1px;
+        left: 0;
+        right: 0;
+        height: 1px;
+        border-bottom: 1px dashed var(--color-dark-9);
+    }
+}
+
+.main-portfolio-link-item {
+    transition: 0.3s ease-in-out;
+
+    &:hover {
+        z-index: 20;
+        box-shadow: 0 0 20px 3px rgba(0, 0, 0, 0.2);
+    }
+}
+
+.bg-waves {
+    background-image: url("./assets/svg/waves.svg");
+    background-position: bottom center;
+    background-repeat: no-repeat;
+    background-size: contain;
+}
+
+.bg-dots {
+    background-image: url("./assets/svg/dots.svg");
+    background-position: top left;
+    background-repeat: no-repeat;
+    background-size: 60%;
+}
+
+.scrolled {
+    display: flex;
+    scroll-behavior: smooth;
+    overflow-x: hidden;
+    overflow-y: scroll;
+
+    &.vertical {
+        margin-right: -20px;
+        padding-right: 20px;
+        overflow-y: auto;
+        overflow-x: hidden;
+    }
+
+    &::-webkit-scrollbar {
+        width: 5px !important;
+        height: 8px !important;
+    }
+
+    &::-webkit-scrollbar-track {
+        background: #0000;
+        cursor: pointer;
+    }
+
+    &::-webkit-scrollbar-thumb {
+        background-color: var(--color-dark-4);
+        border-radius: 10px;
+        transition: background-color .3s ease;
+        cursor: default;
+
+        &:hover {
+            background-color: var(--color-dark-6) !important;
+        }
+    }
+}

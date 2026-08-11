@@ -1,0 +1,5 @@
+.hover:hover {
+    mat-icon {
+        color: var(--color-dark-8);
+    }
+}

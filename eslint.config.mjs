@@ -1,58 +1,33 @@
-import nx from '@nx/eslint-plugin';
+import baseConfig from './eslint.base.config.mjs';
+import { htmlTemplateRules, typescriptRules } from './eslint.rules.mjs';
+import angularTemplateParser from '@angular-eslint/template-parser';
+import angularTemplatePlugin from '@angular-eslint/eslint-plugin-template';
+import angularPlugin from '@angular-eslint/eslint-plugin';
 
 export default [
-  ...nx.configs['flat/base'],
-  ...nx.configs['flat/typescript'],
-  ...nx.configs['flat/javascript'],
-  {
-    ignores: [
-      '**/dist',
-      '**/vite.config.*.timestamp*',
-      '**/vitest.config.*.timestamp*',
-    ],
-  },
-  {
-    files: ['**/*.ts', '**/*.tsx', '**/*.js', '**/*.jsx'],
-    rules: {
-      '@nx/enforce-module-boundaries': [
-        'error',
-        {
-          enforceBuildableLibDependency: true,
-          allow: ['^.*/eslint(\\.base)?\\.config\\.[cm]?[jt]s$'],
-          depConstraints: [
-            {
-              sourceTag: 'scope:shared',
-              onlyDependOnLibsWithTags: ['scope:shared'],
-            },
-            {
-              sourceTag: 'scope:shop',
-              onlyDependOnLibsWithTags: ['scope:shop', 'scope:shared'],
-            },
-            {
-              sourceTag: 'scope:api',
-              onlyDependOnLibsWithTags: ['scope:api', 'scope:shared'],
-            },
-            {
-              sourceTag: 'type:data',
-              onlyDependOnLibsWithTags: ['type:data'],
-            },
-          ],
-        },
-      ],
+    ...baseConfig,
+    {
+        ignores: [
+            '**/dist/**',
+            '**/*.js',
+            '**/*.jsx',
+            'apps/**/src/app/legacy/**/*.html',
+            'libs/**/*.html',
+        ],
     },
-  },
-  {
-    files: [
-      '**/*.ts',
-      '**/*.tsx',
-      '**/*.cts',
-      '**/*.mts',
-      '**/*.js',
-      '**/*.jsx',
-      '**/*.cjs',
-      '**/*.mjs',
-    ],
-    // Override or add rules here
-    rules: {},
-  },
+    {
+        files: ['**/*.{ts,tsx,cts,mts,cjs,mjs}'],
+        plugins: { '@angular-eslint': angularPlugin },
+        rules: typescriptRules,
+    },
+    {
+        files: ['**/*.html'],
+        languageOptions: {
+            parser: angularTemplateParser,
+        },
+        plugins: {
+            '@angular-eslint/template': angularTemplatePlugin,
+        },
+        rules: htmlTemplateRules,
+    },
 ];

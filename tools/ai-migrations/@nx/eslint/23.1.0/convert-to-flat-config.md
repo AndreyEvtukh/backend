@@ -17,7 +17,7 @@ Work systematically through each section below.
 
 The pre-pass handled, mechanically:
 
-- Converted the root and per-project JSON/YAML eslintrc files to `eslint.config.mjs`:
+- Converted the root and per-project JSON/YAML eslintrc files to `../../../../../eslint.config.mjs`:
   - `eslint:recommended` to `js.configs.recommended`
   - `@nx/*` presets to their flat-config equivalents
   - `env` to `languageOptions.globals`
@@ -75,7 +75,7 @@ In your handoff `summary` (1 to 3 sentences per the system prompt), name the sec
 ## Nx-Specific Notes (read first)
 
 - **Flat config is the default in v9**. eslintrc only resolves when `ESLINT_USE_FLAT_CONFIG=false` is set. Nx converts the workspace to flat config so that no environment variable is required.
-- **Shared base config pattern**: many Nx workspaces have a root `eslint.config.mjs` that each project imports, for example `import baseConfig from '../../eslint.config.mjs'`. Convert and verify the base config first, then the per-project configs.
+- **Shared base config pattern**: many Nx workspaces have a root `../../../../../eslint.config.mjs` that each project imports, for example `import baseConfig from '../../eslint.config.mjs'`. Convert and verify the base config first, then the per-project configs.
 - **Inferred plugin targets**: `@nx/eslint/plugin` infers the lint target from the presence of `eslint.config.*`. Renaming or moving the config invalidates inference. After config edits, run `nx reset && nx show project <name>` on a sample project to confirm the target is still present.
 - **FlatCompat shim**: when the pre-pass could not translate a third-party `extends` or a complex override natively, it emitted a `FlatCompat` shim (from the `@eslint/eslintrc` package). That config works as-is, but section 3 covers replacing it with flat-native config where low-risk.
 
@@ -119,7 +119,7 @@ export default [
 
 **Action items**:
 
-- [ ] Convert each JavaScript-based config to `eslint.config.mjs`, mirroring the structure the pre-pass produced for the JSON/YAML configs.
+- [ ] Convert each JavaScript-based config to `../../../../../eslint.config.mjs`, mirroring the structure the pre-pass produced for the JSON/YAML configs.
 - [ ] Preserve the existing rules, plugins, parser options, and overrides.
 - [ ] Delete the original `.eslintrc.js` / `.eslintrc.cjs` once the flat config replaces it.
 - [ ] Update any `project.json` / `nx.json` inputs that referenced the old file name.

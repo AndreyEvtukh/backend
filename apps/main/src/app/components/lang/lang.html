@@ -1,0 +1,7 @@
+<div class="px-4 py-2 rounded-md bg-dark-1 flex flex-row gap-4 text-14 text-dark-6">
+    @for (item of langs; track item.order) {
+        <div class="cursor-pointer hover:text-dark-9 transition-colors duration-200"
+             [ngClass]="{'!text-bronze !cursor-default': item.active}"
+        >{{item.title}}</div>
+    }
+</div>

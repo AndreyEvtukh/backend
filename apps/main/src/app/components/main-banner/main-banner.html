@@ -1,0 +1,40 @@
+<section
+    class="flex flex-row w-full aspect-video h-1/2 max-h-150 bg-dark-2 rounded-2xl mr-12 -ml-12 shadow-banner bg-dots main-banner pr-4 z-10">
+    <div class="flex flex-col gap-8 w-1/2 relative z-10 p-12 justify-between">
+        <div class="flex flex-col justify-center h-full gap-8">
+            <header class="flex flex-col gap-8">
+                <p><span class="text-10 text-dark-1 p-1.5 bg-bronze rounded-sm font-medium">Full-Stack Developer</span></p>
+                <h2 class="text-36 font-medium">Develop — <span class="block">from idea to production.</span></h2>
+            </header>
+            <p class="ml-24">Full-stack developer focused on Angular and Spring Boot. I like taking projects from
+                interface to backend architecture on my own, end to end. Open to interesting problems and new teams.</p>
+            <div class="flex flex-row mt-8">
+                <app-button [data]="CVLinkButtonConfig"></app-button>
+                <app-button [data]="ContactsLinkButtonConfig"></app-button>
+            </div>
+        </div>
+        <footer class="flex flex-row gap-10">
+            @for (item of retro; track item.id) {
+                <div class="flex flex-row gap-3 items-center">
+                    <div class="text-36 font-medium">{{item.value}}</div>
+                    <div class="text-14" [innerText]="item.text"></div>
+                </div>
+            }
+        </footer>
+    </div>
+    <div class="w-1/2 relative z-10">
+        <img alt="Andrey Evtukh" class="author-main-image absolute right-0 bottom-0 h-full"
+             src="./assets/img/AndreyEvtukh.webp"/>
+        <span class="flex-col items-center justify-center w-32 h-32 rounded-full bg-dark-3 right-72 top-2/3 absolute shadow-sm">
+            <mat-icon [svgIcon]="ICONS.Angular" class="!h-20 !w-20"></mat-icon>
+        </span>
+        <span class="flex-col items-center justify-center w-12 h-12 rounded-full bg-dark-3 right-2/3 top-1/3 absolute shadow-sm">
+             <mat-icon [svgIcon]="ICONS.TypeScript" class="!h-8 !w-8"></mat-icon>
+        </span>
+        <span class="flex-col items-center justify-center w-20 h-20 rounded-full bg-dark-3 right-1/3 top-12 absolute shadow-sm">
+             <mat-icon [svgIcon]="ICONS.Java" class="!h-12 !w-12"></mat-icon>
+        </span>
+        <span class="w-6 h-6 rounded-full bg-pink right-6/12 top-44 absolute deco"></span>
+        <span class="w-2 h-2 rounded-full bg-gold  right-1/12 top-10 absolute deco"></span>
+    </div>
+</section>

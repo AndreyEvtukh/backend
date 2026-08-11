@@ -1,0 +1,37 @@
+<div>
+    <!-- MAIN BANNER -->
+    <section class="flex relative">
+        <app-main-banner class="w-full z-10"></app-main-banner>
+        <div class="absolute w-full min-h-1/2 gradient-fade-black bottom-0 opacity-30"></div>
+    </section>
+
+    <section appScrollSpy id="about" class="flex flex-row relative bg-waves justify-center">
+        <div class="absolute w-full min-h-1/2 gradient-black-fade top-0 opacity-30"></div>
+
+        <div class="z-10 absolute top-12 scroll-icon opacity-40 color-dark-9
+        after:content-[''] after:block after:absolute after:h-8 after:top-10 after:left-1/2 after:border-r after:border-dashed after:border-dark-8
+        before:content-[''] before:block before:absolute before:h-2 before:w-2 before:rounded-full before:top-16 before:left-1/2 before:border before:border-dark-8 before:-translate-x-1/2 before:translate-y-full">
+            <mat-icon [svgIcon]="ICONS.Mice" class="color-dark-7 !h-10 !w-10"></mat-icon>
+        </div>
+
+        <div class="flex flex-col flex-col-reverse max-w-2xl lg:max-w-full relative pt-36 items-center lg:flex-row lg:pt-0">
+            <div class="w-full lg:w-1/2 p-12 2xl:p-24 relative flex flex-col justify-center">
+                <!-- PORTFOLIO LINKS -->
+                <app-portfolio-links></app-portfolio-links>
+            </div>
+
+            <div class="w-full lg:w-1/2 p-12 2xl:p-24 relative flex flex-col justify-center">
+                <!-- WHO I AM -->
+                <app-whoiam></app-whoiam>
+            </div>
+        </div>
+    </section>
+
+    <section class="flex flex-row bg-dark-3">
+        <div class="w-full p-24 relative">
+
+            <!-- TESTIMONIALS LINKS -->
+            <app-testimonials></app-testimonials>
+        </div>
+    </section>
+</div>

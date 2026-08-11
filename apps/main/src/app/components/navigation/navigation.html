@@ -1,0 +1,50 @@
+@if (isSide() && showSideNav()) {
+    <div class="flex flex-col gap-2 items-center" @sideNavAnimation>
+        <nav
+            class="flex text-14 relative flex-col !gap-2 bg-dark-1 w-full p-2 rounded-full border border-dark-6 left-0">
+            @for (item of routesList(); track item!.title) {
+                <a class="flex items-center transition-colors duration-200"
+                   [ngClass]="{
+                    'cursor-pointer': !isRouteActive(item) || !isHeader(),
+                    'color-dark-9': isRouteActive(item),
+                    'uppercase text-dark-6 hover:text-dark-8': isHeader(),
+                    'text-dark-6 hover:text-dark-8': !isFooter(),
+                    '!p-2 !rounded-full': isSide(),
+                    '!bg-dark-9': isSide() && isRouteActive(item)
+                  }"
+                   (click)="gotoView(item)">
+                    <mat-icon [svgIcon]="item.icon" class="!h-4 !w-4 !text-dark-6"></mat-icon>
+                </a>
+            }
+        </nav>
+        <app-login-link-button [location]="NAV_LOCATION.SIDE"></app-login-link-button>
+    </div>
+} @else if (!isSide()) {
+    <nav class="flex text-14 relative left-0"
+         [ngClass]="{
+            'flex-row items-center gap-4': isHeader(),
+            'flex-col text-left': !isHeader(),
+            '!gap-2': isFooter(),
+          }">
+        @for (item of routesList(); track item!.title) {
+            <a class="flex items-center transition-colors duration-200"
+               [ngClass]="{
+                'cursor-pointer': !isRouteActive(item) || !isHeader(),
+                'color-dark-9': isRouteActive(item),
+                'uppercase text-dark-6 hover:text-dark-8': isHeader(),
+                'text-dark-6 hover:text-dark-8': !isFooter(),
+              }"
+               (click)="gotoView(item)">
+                @if ((item!.title.toLowerCase() === ROUTE_PATH.HOME && isHeader())) {
+                    <mat-icon
+                        [svgIcon]="item.icon"
+                        class="!h-4 !w-4"
+                        [class.!color-dark-9]="isRouteActive(item)"
+                    ></mat-icon>
+                } @else {
+                    {{ item!.title }}
+                }
+            </a>
+        }
+    </nav>
+}

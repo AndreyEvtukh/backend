@@ -1,0 +1,17 @@
+<?xml version="1.0" encoding="utf-8"?>
+<svg version="1.1" xmlns="http://www.w3.org/2000/svg" xmlns:xlink="http://www.w3.org/1999/xlink" x="0px" y="0px"
+	 viewBox="0 0 40 40" style="enable-background:new 0 0 40 40;" xml:space="preserve">
+<style type="text/css">
+	.st0_angular{fill:#BDBDBD;}
+	.st1_angular{fill:#B72025;}
+	.st2_angular{fill:#DC3326;}
+	.st3_angular{fill:#EEEDEE;}
+</style>
+<g>
+	<path class="st0_angular" d="M19.94,0L0.91,6.62l3.01,24.66L19.96,40l16.13-8.84l3.01-24.66L19.94,0z"/>
+	<path class="st1_angular" d="M37.11,7.75L20,1.94V37.9l14.39-7.89L37.11,7.75z"/>
+	<path class="st2_angular" d="M19.95,1.92L2.89,7.86l2.72,22.27l14.35,7.8L20,37.9V1.94L19.95,1.92z"/>
+	<polygon class="st0_angular" points="31.81,29.09 20,3.63 20,12.28 23.58,20 20,20 20,23.64 25.27,23.64 27.8,29.09 	"/>
+	<polygon class="st3_angular" points="20,3.63 8.19,29.09 12.2,29.09 14.73,23.64 20,23.64 20,20 16.42,20 20,12.28 	"/>
+</g>
+</svg>

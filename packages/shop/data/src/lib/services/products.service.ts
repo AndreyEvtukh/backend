@@ -3,12 +3,14 @@ import { HttpClient, HttpParams } from '@angular/common/http';
 import { Observable, map, catchError, of } from 'rxjs';
 import { Product, ApiResponse, PaginatedResponse, ProductFilter } from '@org/models';
 
+import { environment } from '../../../../../../environments/environment';
+
 @Injectable({
   providedIn: 'root',
 })
 export class ProductsService {
   private readonly http = inject(HttpClient);
-  private readonly apiUrl = 'http://localhost:3333/api';
+  private readonly apiUrl = `http://${environment.api_host}:${environment.api_port}/api`;
 
   // Signals for state management
   private readonly loadingSignal = signal(false);

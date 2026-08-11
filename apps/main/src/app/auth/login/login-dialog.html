@@ -1,0 +1,87 @@
+<section
+    class="bg-dark-2 flex flex-col items-center h-full px-8 pt-8 pb-4 overflow-hidden rounded-md border border-dark-3 justify-center items-center">
+    <div class="flex flex-col items-center justify-center w-full gap-8">
+        <div class=" dialog-drag-handle w-16 h-16 aspect-square rounded-full bg-bronze-30 flex flex-col justify-center items-center">
+            <mat-icon [svgIcon]="ICONS.Login" class="color-bronze"></mat-icon>
+        </div>
+        <h2 class="uppercase font-medium">Sign In</h2>
+
+        <form class="flex flex-col justify-center gap-0 max-w-2xs w-full" [formGroup]="form"
+              [class.waiting]="waiting()">
+            <mat-form-field class="w-full relative z-10">
+                <mat-label>{{ "Email" }}</mat-label>
+                <input matInput
+                       id="email"
+                       type="email"
+                       formControlName="email"
+                       class="!border !border-b-dark-9 !p-2 !rounded-sm"
+                       (blur)="doBlurredInput('email')"
+                       required/>
+                @if (form.controls['email'].invalid) {
+                    <mat-error class="error">
+                        @if (form.controls['email'].errors?.['required']) {
+                            <small> {{ "E-mail" }} {{ "is required" }} </small>
+                        }
+                        @if (emailIsInvalid && !form.controls['email'].errors?.['required']) {
+                            <small> {{ "Email is Invalid" }} </small>
+                        }
+                    </mat-error>
+                }
+            </mat-form-field>
+
+            <mat-form-field class="w-full relative z-10">
+                <mat-label>{{ "Password" }}</mat-label>
+                <input matInput
+                       id="password"
+                       type="password"
+                       formControlName="password"
+                       class="!border !border-b-dark-9 !p-2 !rounded-sm"
+                       (blur)="doBlurredInput('password')"
+                       required/>
+                @if (form.controls['password'].invalid) {
+                    <mat-error class="error">
+                        @if (form.controls['password'].errors?.['required']) {
+                            <small> {{ "Password" }} {{ "is required" }} </small>
+                        }
+                        @if (form.controls['password'].errors?.['whitespace'] && !form.controls['password'].errors['required']) {
+                            <small> {{ "Password" }} {{ "can't contain whitespace" }} </small>
+                        }
+                    </mat-error>
+                }
+            </mat-form-field>
+        </form>
+
+        <div class="w-full flex flex-row gap-8 justify-center items-center">
+            <button matButton="filled"
+                    class="cursor-pointer text-bronze capitalize hover:underline"
+                    (click)="goRegister()">
+                Forgot Password?
+            </button>
+
+            <button matButton="filled"
+                    class="cursor-pointer text-bronze capitalize hover:underline"
+                    (click)="goRegister()">
+                Register
+            </button>
+        </div>
+
+        <mat-dialog-actions align="end" class="w-full flex flex-col justify-center gap-6">
+            <button matButton="filled"
+                    class="uppercase max-w-2xs h-10 w-full rounded-sm p-2 font-medium cursor-pointer transition-all duration-200
+                         bg-bronze text-dark-2 border-bronze border
+                         disabled:bg-dark-3 disabled:text-dark-6 disabled:!border-dark-4
+                         disabled:cursor-not-allowed"
+                    [disabled]="form.invalid"
+                    (click)="signIn()"
+            >
+                Sign In
+            </button>
+
+            <button matButton="filled"
+                    class="cursor-pointer"
+                    (click)="close()">
+                Cancel
+            </button>
+        </mat-dialog-actions>
+    </div>
+</section>

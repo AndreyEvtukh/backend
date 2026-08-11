@@ -1,0 +1,16 @@
+<button
+    [class]="
+            'flex flex-row gap-4 items-center cursor-pointer py-2.5  pl-8 pr-8 ' +
+            (data().labelClass ?? '') + ' ' +
+            (data().borderClass ?? '') + ' ' +
+            (data().hoverClass ?? '') + ' ' +
+            (data().bgClass ?? 'bg-transparent') + ' ' +
+            (data().roundedClass ?? 'rounded-md')
+          "
+    [ngClass]="{ '!pr-4 !pl-6' : data().icon  }"
+    [disabled]="data().isDisabled">
+    <span>{{ data().label }}</span>
+    @if (data().icon) {
+        <mat-icon [svgIcon]="data().icon!" class="color-dark-9 !w-4 aspect-square"/>
+    }
+</button>

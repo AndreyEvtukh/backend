@@ -1,0 +1,37 @@
+// @ts-check
+import { defineConfig } from "eslint/config";
+import rootConfig from "../../eslint.config.mjs";
+
+export default defineConfig([
+  ...rootConfig,
+  {
+    files: ["**/*.ts"],
+    languageOptions: {
+      parserOptions: {
+        projectService: true,
+      },
+    },
+    rules: {
+      "@angular-eslint/directive-selector": [
+        "error",
+        {
+          type: "attribute",
+          prefix: "app",
+          style: "camelCase",
+        },
+      ],
+      "@angular-eslint/component-selector": [
+        "error",
+        {
+          type: "element",
+          prefix: "app",
+          style: "kebab-case",
+        },
+      ],
+    },
+  },
+  {
+    files: ["**/*.html"],
+    rules: {},
+  }
+]);

@@ -1,0 +1,36 @@
+<footer class="flex flex-col w-full mx-24">
+    <div class="flex flex-row py-8 items-center w-full">
+        <div class="flex flex-col items-start w-6/12 h-full gap-2">
+            <div class="text-16">Andrey&#160;<span class="text-bronze">Evtukh</span></div>
+            <div class="text-14 opacity-40">Built with Angular · Spring Boot · Express</div>
+            <div class="text-14 text-bronze mt-4 list-item list-inside">Available for new projects</div>
+        </div>
+
+        <div class="flex flex-col items-start w-2/12 gap-4 h-full">
+            <h4 class="w-full text-14 text-dark-6 uppercase">{{ "Navigation" }}</h4>
+            <app-navigation class="w-full flex" location="footer"></app-navigation>
+        </div>
+
+        <div class="flex flex-col items-start w-2/12 gap-4 text-14 justify-start h-full">
+            <h4 class="w-full text-dark-6 uppercase">{{ "Connect" }}</h4>
+            <div class="flex flex-col text-left gap-2 cursor-pointer">
+                <a> GitHub </a>
+                <a> LinkedIn </a>
+                <a> Telegram </a>
+            </div>
+        </div>
+
+        <div class="flex flex-row items-center w-2/12">
+            <p class="text-bronze text-14">Get in touch</p>
+        </div>
+    </div>
+
+    <div class="border-b border-b-solid border-b-dark-4"></div>
+
+    <div class="flex flex-row w-full pt-4 pb-12 justify-between text-14 items-center relative">
+        <div class="z-10 text-dark-6">© 2026 Andrey Evtukh</div>
+        <app-lang class="z-10"></app-lang>
+        <div class="-mx-24 absolute right-0 left-0 bottom-0 h-full gradient-fade-black z-0 opacity-30"></div>
+    </div>
+
+</footer>

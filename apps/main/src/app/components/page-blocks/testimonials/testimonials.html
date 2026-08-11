@@ -1,0 +1,58 @@
+<article class="flex flex-col gap-5">
+    <header>
+        <h3 class="font-medium text-18 ml-12">Testimonials</h3>
+    </header>
+    <div class="flex flex-row relative items-center">
+        <div
+            class="z-10 absolute -left-2 -translate-x-full h-full w-12 flex flex-col items-center justify-center rounded-md"
+            [class.hover:transition]="!isLeftDisabled()"
+            [class.hover:bg-dark-2-30]="!isLeftDisabled()"
+            [class.cursor-pointer]="!isLeftDisabled()"
+            (click)="toLeft()"
+        >
+            <mat-icon [svgIcon]="ICONS.ArrowR" class="color-bronze z-10 rotate-180 transition-colors duration-200"
+                      [class.color-bronze]="!isLeftDisabled()"
+                      [class.color-dark-4]="isLeftDisabled()"
+                      [class.disabled]="isLeftDisabled()"
+            ></mat-icon>
+        </div>
+        <div
+            class="z-10 absolute -right-4 translate-x-full h-full w-12 flex flex-col items-center justify-center rounded-md"
+            [class.hover:transition]="!isRightDisabled()"
+            [class.hover:bg-dark-2-30]="!isRightDisabled()"
+            [class.cursor-pointer]="!isRightDisabled()"
+            (click)="toRight()"
+        >
+            <mat-icon [svgIcon]="ICONS.ArrowR" class="color-bronze z-10 transition-colors duration-200"
+                      [class.color-bronze]="!isRightDisabled()"
+                      [class.color-dark-4]="isRightDisabled()"
+                      [class.disabled]="isRightDisabled()"
+            ></mat-icon>
+        </div>
+        <div class="flex flex-row overflow-hidden relative">
+            @if (sliderIndex() < 0) {
+                <div class="absolute w-1/12 h-full bg-grad-fade-to-dark-3 z-10 left-0"></div>
+            }
+            @if (sliderIndex() > -2) {
+                <div class="absolute w-1/12 h-full bg-grad-dark-3-to-fade z-10 right-0"></div>
+            }
+            <div #scrollContainer class="flex flex-row w-full relative gap-5 transition-transform duration-200">
+                @for (item of testimonials(); track item.id; ) {
+                    <div
+                        class="relative flex flex-col p-8 border-solid border-dark-4 rounded-md border min-w-2/5 h-full min-h-48 justify-between bg-dark-2 gap-5">
+                        <div class="flex absolute top-4 left-8 gap-1">
+                            @for (dot of [].constructor($index + 1); track $index) {
+                                <div class="w-1 h-1 bg-dark-4"></div>
+                            }
+                        </div>
+                        <div class="text-14 h-20 scrolled vertical overflow-y-scroll" [innerText]="item.text"></div>
+                        <div>
+                            <div class="text-14 font-medium text-bronze capitalize">{{ item.authorName }}</div>
+                            <div class="text-14 capitalize">{{ item.authorPosition }}</div>
+                        </div>
+                    </div>
+                }
+            </div>
+        </div>
+    </div>
+</article>

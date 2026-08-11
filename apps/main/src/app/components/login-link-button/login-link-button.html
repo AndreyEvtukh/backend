@@ -1,0 +1,8 @@
+<button class="!h-full bg-dark-1 flex flex flex-row text-dark-6 aspect-square items-center justify-center hover cursor-pointer"
+        [ngClass] = "{'p-1.5 rounded-md': !isSide(), 'p-3 rounded-full border border-dark-6': isSide()}"
+        (click)="login()">
+    <mat-icon [svgIcon]="ICONS.Login"
+              class=" color-dark-4 transition-all duration-200"
+              [ngClass] = "{'!h-4 !w-4': !isSide()}"
+    ></mat-icon>
+</button>

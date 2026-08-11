@@ -9,13 +9,20 @@ export const appRoutes: Route[] = [
   {
     path: 'products',
     loadChildren: () =>
-      import('@org/shop/feature-products').then(m => m.featureProductsRoutes),
+      import('@org/shop/feature-products').then(
+          m => {
+              console.error(555)
+              return m.featureProductsRoutes
+          }),
   },
   {
     path: 'products',
     loadChildren: () =>
       import('@org/shop/feature-product-detail').then(
-        m => m.featureProductDetailRoutes
+        m => {
+          console.error(111)
+          return m.featureProductDetailRoutes
+        }
       ),
   },
   {

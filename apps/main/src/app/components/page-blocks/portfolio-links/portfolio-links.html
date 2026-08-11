@@ -1,0 +1,5 @@
+<article class="flex flex-col gap-5">
+    @for (link of links; track link.id) {
+        <app-main-portfolio-link-item [data]="link"></app-main-portfolio-link-item>
+    }
+</article>
