@@ -18,15 +18,22 @@ spring:
         format_sql: true
     show-sql: true
 
-  web:
-    servlet:
-      path: /api
-
   graphql:
+    http:
+      path: /api/graphql
     graphiql:
-      enabled: true   # UI для ручного тестирования запросов: http://localhost:8080/graphiql
+      enabled: true
+      path: /api/graphiql
     cors:
-      allowed-origins: "*"   # для прод — сузить до конкретного домена FE
+      allowed-origins:
+        - https://dev.andrey-evtukh.vercel.app
+        - https://andrey-evtukh.vercel.app
+      allowed-methods:
+        - GET
+        - POST
+        - OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
 
   mail:
     test-connection: true
