@@ -13,7 +13,7 @@ public class WebConfig {
         return new WebMvcConfigurer() {
             @Override
             public void addCorsMappings(CorsRegistry registry) {
-                registry.addMapping("/graphql")
+                registry.addMapping("/api/graphql")
                         .allowedOrigins(
                                 "https://dev.andrey-evtukh.vercel.app",
                                 "https://andrey-evtukh.vercel.app"
