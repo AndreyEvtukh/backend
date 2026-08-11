@@ -1,0 +1,73 @@
+type Query {
+    """Проверка: зарегистрирован ли email (registered = true)"""
+    emailExists(email: String!): EmailExistsPayload!
+}
+
+type Mutation {
+    """Шаг 1 регистрации: отправить 6-значный код на email"""
+    requestRegistration(input: RegisterRequestInput!): MessagePayload!
+
+    """Шаг 2 регистрации: подтвердить код → создать user (registered=true) → JWT"""
+    confirmRegistration(input: ConfirmRegistrationInput!): AuthPayload!
+
+    """Логин по email + password → JWT"""
+    login(input: LoginInput!): AuthPayload!
+
+    """Запрос сброса пароля: письмо с кодом на email"""
+    requestPasswordReset(email: String!): MessagePayload!
+
+    """Установка нового пароля по коду из письма"""
+    resetPassword(input: ResetPasswordInput!): MessagePayload!
+}
+
+input RegisterRequestInput {
+    email: String!
+    username: String!
+    password_hash: String!
+}
+
+input ConfirmRegistrationInput {
+    email: String!
+    code: String!
+}
+
+input LoginInput {
+    email: String!
+    password: String!
+}
+
+input ResetPasswordInput {
+    email: String!
+    code: String!
+    newPassword: String!
+}
+
+type AuthPayload {
+    success: Boolean!
+    token: String
+    message: String
+}
+
+type MessagePayload {
+    success: Boolean!
+    message: String
+}
+
+type EmailExistsPayload {
+    success: Boolean!
+}
+
+
+#type Query {
+#    users: [User!]
+#}
+#
+#type User {
+#    id: ID
+#    email: String
+#    username: String
+#    created_at: String
+#    role: String
+#    password_hash: String
+#    enabled: Boolean
+#}

@@ -1,0 +1,65 @@
+spring:
+  application:
+    name: backend
+
+  datasource:
+    url: jdbc:postgresql://ep-damp-violet-ax1b2bk1-pooler.c-4.us-east-2.aws.neon.tech:5432/neondb?sslmode=require&channel_binding=require
+    username: ${DB_USER}
+    password: ${DB_PASSWORD}
+    driver-class-name: org.postgresql.Driver
+
+  jpa:
+    hibernate:
+      ddl-auto: validate
+    open-in-view: false
+    properties:
+      hibernate:
+        dialect: org.hibernate.dialect.PostgreSQLDialect
+        format_sql: true
+    show-sql: true
+
+  graphql:
+    graphiql:
+      enabled: true   # UI для ручного тестирования запросов: http://localhost:8080/graphiql
+    cors:
+      allowed-origins: "*"   # для прод — сузить до конкретного домена FE
+
+  mail:
+    test-connection: true
+    host: smtp.gmail.com
+    port: 587
+    username: ${MAIL_USERNAME:andrey.evtukh@gmail.com}
+    password: ${MAIL_PASSWORD:d2hqbHF2Y3Zyc3d4ZWZ6dg==}
+    properties:
+      mail:
+        debug: true
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+            required: true
+
+server:
+  port: 8080
+
+mail:
+  host: ${spring.mail.host}
+  port: ${spring.mail.port}
+  username: ${spring.mail.username}
+  password: ${spring.mail.password}
+
+jwt:
+  # Секрет тоже из переменной окружения. Значение ниже — только дефолт для локальной разработки.
+  secret: ${JWT_SECRET:this-is-a-dev-only-secret-change-it-please-32bytes}
+  expiration-ms: 3600000   # 1 час
+
+app:
+  frontend-url: http://localhost:4200   # для ссылки сброса пароля
+  verification-code-ttl-minutes: 15
+
+logging:
+  level:
+    org.springframework.graphql: DEBUG
+    org.springframework.web: DEBUG
+    org.springframework.http: TRACE
+    jakarta.mail: DEBUG
