@@ -33,9 +33,10 @@ public class SecurityConfig {
                         .requestMatchers(
                                 "/api/auth/**",
                                 "/api/users",
-                                "/graphiql",
-                                "/graphiql/**",
-                                "/vendor/**"
+                                "/api/graphql",
+                                "/api/graphiql",
+                                "/api/graphiql/**",
+                                "/api/vendor/**"
                         ).permitAll()
                         // Все остальные запросы требуют аутентификации (JWT)
                         .anyRequest().permitAll()
