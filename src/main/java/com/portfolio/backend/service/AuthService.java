@@ -44,33 +44,40 @@ public class AuthService {
             String password
     ) {
         email = email.trim().toLowerCase();
-
-        userRepository.findByEmail(email).ifPresent(u -> {
-            if (u.isRegistered()) {
-                throw new IllegalArgumentException("Email already registered");
-            }
-        });
-
-        String code = generateSixDigitCode();
-        String passwordHash = passwordEncoder.encode(password);
-
-        // Без Jackson: username + перевод строки + passwordHash
-        String payload = username + "\n" + passwordHash;
-
-        VerificationCode vc = new VerificationCode();
-        vc.setEmail(email);
-        vc.setCode(code);
-        vc.setType(Type.REGISTER);
-        vc.setPayload(payload);
-        vc.setExpiresAt(Instant.now().plus(codeTtlMinutes, ChronoUnit.MINUTES));
-        vc.setUsed(false);
-        codeRepository.save(vc);
-
+        System.out.println(email);
+        System.out.println(username);
+        System.out.println(password);
         emailService.send(
-                email,
-                "Код подтверждения регистрации",
-                "Ваш код: " + code + "\nКод действует " + codeTtlMinutes + " минут."
+                "andrey.evtukh@gmail.com",
+                "тест",
+                "тест"
         );
+//        userRepository.findByEmail(email).ifPresent(u -> {
+//            if (u.isRegistered()) {
+//                throw new IllegalArgumentException("Email already registered");
+//            }
+//        });
+//
+//        String code = generateSixDigitCode();
+//        String passwordHash = passwordEncoder.encode(password);
+//
+//        // Без Jackson: username + перевод строки + passwordHash
+//        String payload = username + "\n" + passwordHash;
+//
+//        VerificationCode vc = new VerificationCode();
+//        vc.setEmail(email);
+//        vc.setCode(code);
+//        vc.setType(Type.REGISTER);
+//        vc.setPayload(payload);
+//        vc.setExpiresAt(Instant.now().plus(codeTtlMinutes, ChronoUnit.MINUTES));
+//        vc.setUsed(false);
+//        codeRepository.save(vc);
+//
+//        emailService.send(
+//                email,
+//                "Код подтверждения регистрации",
+//                "Ваш код: " + code + "\nКод действует " + codeTtlMinutes + " минут."
+//        );
     }
 
     // -------------------------------------------------------------------------
