@@ -4,6 +4,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
+import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Map;
 
@@ -42,15 +43,43 @@ public class ResendEmailService {
                 "text", text
         );
 
-        restClient
-                .post()
-                .contentType(MediaType.APPLICATION_JSON)
-                .header(
-                        "Authorization",
-                        "Bearer " + apiKey
-                )
-                .body(request)
-                .retrieve()
-                .toBodilessEntity();
+        try {
+            restClient
+                    .post()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .header(
+                            "Authorization",
+                            "Bearer " + apiKey
+                    )
+                    .body(request)
+                    .retrieve()
+                    .toBodilessEntity();
+
+        } catch (RestClientResponseException e) {
+
+            System.err.println(
+                    "========== RESEND ERROR =========="
+            );
+
+            System.err.println(
+                    "HTTP status: " + e.getStatusCode()
+            );
+
+            System.err.println(
+                    "Response: " + e.getResponseBodyAsString()
+            );
+
+            System.err.println(
+                    "=================================="
+            );
+
+            throw new IllegalStateException(
+                    "Resend API error: "
+                            + e.getStatusCode()
+                            + " - "
+                            + e.getResponseBodyAsString(),
+                    e
+            );
+        }
     }
 }

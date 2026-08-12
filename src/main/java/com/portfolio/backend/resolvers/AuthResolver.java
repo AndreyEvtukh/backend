@@ -52,8 +52,10 @@ public class AuthResolver {
             );
 
         } catch (Exception e) {
+            e.printStackTrace();
+
             return MessagePayload.fail(
-                    "Unable to send verification email"
+                    e.getMessage()
             );
         }
     }

@@ -58,7 +58,7 @@ server:
 
 resend:
   api-key: ${RESEND_API_KEY}
-  from: ${MAIL_FROM:Portfolio <andrey.evtukh@gmail.com>}
+  from: ${MAIL_FROM:andrey.evtukh@gmail.com}
 
 #mail:
 #  host: ${spring.mail.host}
