@@ -35,24 +35,6 @@ spring:
       allowed-headers: "*"
       allow-credentials: true
 
-#  mail:
-#    test-connection: true
-#    host: smtp.gmail.com
-#    port: 587
-#    username: ${MAIL_USERNAME:andrey.evtukh@gmail.com}
-#    password: ${MAIL_PASSWORD:zwwk rnej fiys qgbm}
-#    properties:
-#      mail:
-#        debug: true
-#        smtp:
-#          auth: true
-#          connectiontimeout: 10000
-#          timeout: 10000
-#          writetimeout: 10000
-#          starttls:
-#            enable: true
-#            required: true
-
 server:
   port: 8080
 
@@ -60,20 +42,13 @@ resend:
   api-key: ${RESEND_API_KEY}
   from: ${MAIL_FROM:andrey.evtukh@gmail.com}
 
-#mail:
-#  host: ${spring.mail.host}
-#  port: ${spring.mail.port}
-#  username: ${spring.mail.username}
-#  password: ${spring.mail.password}
-
 jwt:
-  # Секрет тоже из переменной окружения. Значение ниже — только дефолт для локальной разработки.
-  secret: ${JWT_SECRET:this-is-a-dev-only-secret-change-it-please-32bytes}
+  secret: ${JWT_SECRET:436a2692f8e7fb78240068bb110d87f5222a8486c7f98fd06884e71a2b3178c9}
   expiration-ms: 3600000   # 1 час
 
 app:
   frontend-url: http://localhost:4200   # для ссылки сброса пароля
-  verification-code-ttl-minutes: 15
+  verification-code-ttl-minutes: 5
 
 logging:
   level:

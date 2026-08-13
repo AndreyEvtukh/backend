@@ -33,7 +33,7 @@ input ConfirmRegistrationInput {
 
 input LoginInput {
     email: String!
-    password: String!
+    password_hash: String!
 }
 
 input ResetPasswordInput {
@@ -51,23 +51,9 @@ type AuthPayload {
 type MessagePayload {
     success: Boolean!
     message: String
+    code: Int
 }
 
 type EmailExistsPayload {
     success: Boolean!
 }
-
-
-#type Query {
-#    users: [User!]
-#}
-#
-#type User {
-#    id: ID
-#    email: String
-#    username: String
-#    created_at: String
-#    role: String
-#    password_hash: String
-#    enabled: Boolean
-#}

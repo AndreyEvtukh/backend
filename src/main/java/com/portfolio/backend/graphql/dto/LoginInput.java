@@ -1,4 +1,4 @@
 package com.portfolio.backend.graphql.dto;
 
-public record LoginInput(String email, String password) {}
+public record LoginInput(String email, String password_hash) {}
 

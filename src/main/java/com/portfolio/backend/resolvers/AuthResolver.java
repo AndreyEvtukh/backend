@@ -19,9 +19,7 @@ public class AuthResolver {
     // -------------------------------------------------------------------------
 
     @QueryMapping
-    public EmailExistsPayload emailExists(
-            @Argument String email
-    ) {
+    public EmailExistsPayload emailExists(@Argument String email) {
         boolean exists = authService.emailExists(email);
 
         return new EmailExistsPayload(exists);
@@ -32,31 +30,16 @@ public class AuthResolver {
     // -------------------------------------------------------------------------
 
     @MutationMapping
-    public MessagePayload requestRegistration(
-            @Argument RegisterRequestInput input
-    ) {
+    public MessagePayload requestRegistration(@Argument RegisterRequestInput input) {
         try {
             authService.requestRegistration(
                     input.email(),
                     input.username(),
                     input.password_hash()
             );
-
-            return MessagePayload.ok(
-                    "Verification code sent to email"
-            );
-
+            return MessagePayload.ok("Verification code sent to email");
         } catch (IllegalArgumentException e) {
-            return MessagePayload.fail(
-                    e.getMessage()
-            );
-
-        } catch (Exception e) {
-            e.printStackTrace();
-
-            return MessagePayload.fail(
-                    e.getMessage()
-            );
+            return MessagePayload.fail(e.getMessage());
         }
     }
 
@@ -65,9 +48,7 @@ public class AuthResolver {
     // -------------------------------------------------------------------------
 
     @MutationMapping
-    public AuthPayload confirmRegistration(
-            @Argument ConfirmRegistrationInput input
-    ) {
+    public AuthPayload confirmRegistration(@Argument ConfirmRegistrationInput input) {
         try {
             String token = authService.confirmRegistration(
                     input.email(),
@@ -77,9 +58,7 @@ public class AuthResolver {
             return AuthPayload.ok(token);
 
         } catch (IllegalArgumentException e) {
-            return AuthPayload.fail(
-                    e.getMessage()
-            );
+            return AuthPayload.fail(e.getMessage());
         }
     }
 
@@ -88,21 +67,17 @@ public class AuthResolver {
     // -------------------------------------------------------------------------
 
     @MutationMapping
-    public AuthPayload login(
-            @Argument LoginInput input
-    ) {
+    public AuthPayload login(@Argument LoginInput input) {
         try {
             String token = authService.login(
                     input.email(),
-                    input.password()
+                    input.password_hash()
             );
 
             return AuthPayload.ok(token);
 
         } catch (IllegalArgumentException e) {
-            return AuthPayload.fail(
-                    e.getMessage()
-            );
+            return AuthPayload.fail(e.getMessage());
         }
     }
 
@@ -111,20 +86,15 @@ public class AuthResolver {
     // -------------------------------------------------------------------------
 
     @MutationMapping
-    public MessagePayload requestPasswordReset(
-            @Argument String email
-    ) {
+    public MessagePayload requestPasswordReset(@Argument String email) {
         try {
             authService.requestPasswordReset(email);
-
         } catch (Exception e) {
             // Не раскрываем существование email
             // и не возвращаем внутреннюю ошибку клиенту.
         }
 
-        return MessagePayload.ok(
-                "If the email exists, a reset message has been sent"
-        );
+        return MessagePayload.ok("If the email exists, a reset message has been sent");
     }
 
     // -------------------------------------------------------------------------
@@ -142,9 +112,7 @@ public class AuthResolver {
                     input.newPassword()
             );
 
-            return MessagePayload.ok(
-                    "Password updated"
-            );
+            return MessagePayload.ok("Password updated");
 
         } catch (IllegalArgumentException e) {
             return MessagePayload.fail(

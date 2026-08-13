@@ -11,8 +11,7 @@ import java.util.Map;
 @Service
 public class ResendEmailService {
 
-    private static final String RESEND_API_URL =
-            "https://api.resend.com/emails";
+    private static final String RESEND_API_URL = "https://api.resend.com/emails";
 
     private final RestClient restClient;
     private final String apiKey;
@@ -47,39 +46,19 @@ public class ResendEmailService {
             restClient
                     .post()
                     .contentType(MediaType.APPLICATION_JSON)
-                    .header(
-                            "Authorization",
-                            "Bearer " + apiKey
-                    )
+                    .header("Authorization", "Bearer " + apiKey)
                     .body(request)
                     .retrieve()
                     .toBodilessEntity();
 
         } catch (RestClientResponseException e) {
 
-            System.err.println(
-                    "========== RESEND ERROR =========="
-            );
+            System.err.println("========== RESEND ERROR ==========");
+            System.err.println("HTTP status: " + e.getStatusCode());
+            System.err.println("Response: " + e.getResponseBodyAsString());
+            System.err.println("==================================");
 
-            System.err.println(
-                    "HTTP status: " + e.getStatusCode()
-            );
-
-            System.err.println(
-                    "Response: " + e.getResponseBodyAsString()
-            );
-
-            System.err.println(
-                    "=================================="
-            );
-
-            throw new IllegalStateException(
-                    "Resend API error: "
-                            + e.getStatusCode()
-                            + " - "
-                            + e.getResponseBodyAsString(),
-                    e
-            );
+            throw new IllegalStateException("Resend API error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e );
         }
     }
 }
