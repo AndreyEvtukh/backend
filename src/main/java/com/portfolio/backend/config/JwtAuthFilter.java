@@ -1,6 +1,6 @@
 package com.portfolio.backend.config;
 
-import com.portfolio.backend.jwt.JwtService;
+import com.portfolio.backend.service.JwtService;
 import io.jsonwebtoken.JwtException;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
@@ -12,6 +12,7 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
+import jakarta.servlet.http.Cookie;
 
 import java.io.IOException;
 import java.util.List;
@@ -26,24 +27,52 @@ public class JwtAuthFilter extends OncePerRequestFilter {
 
     @Override
     protected void doFilterInternal(@NonNull HttpServletRequest request,
-                                     @NonNull HttpServletResponse response,
-                                     @NonNull FilterChain filterChain) throws ServletException, IOException {
+                                    @NonNull HttpServletResponse response,
+                                    @NonNull FilterChain filterChain
+    ) throws ServletException, IOException {
 
-        String header = request.getHeader(HEADER);
+        String token = extractToken(request);
 
-        if (header != null && header.startsWith(PREFIX)) {
-            String token = header.substring(PREFIX.length());
+        if (token != null) {
             try {
                 String subject = jwtService.validateAndGetSubject(token);
-                var authToken = new UsernamePasswordAuthenticationToken(subject, null, List.of());
+
+                var authToken = new UsernamePasswordAuthenticationToken(
+                        subject,
+                        null,
+                        List.of()
+                );
+
                 SecurityContextHolder.getContext().setAuthentication(authToken);
+
             } catch (JwtException e) {
-                // Невалидный/просроченный токен — просто не аутентифицируем.
-                // Дальше SecurityConfig отклонит запрос к защищённым эндпоинтам.
                 SecurityContextHolder.clearContext();
             }
         }
 
         filterChain.doFilter(request, response);
+    }
+
+    private String extractToken(HttpServletRequest request) {
+
+        // 1. Authorization: Bearer <JWT>
+        String header = request.getHeader(HEADER);
+
+        if (header != null && header.startsWith(PREFIX)) {
+            return header.substring(PREFIX.length());
+        }
+
+        // 2. Cookie: access_token=<JWT>
+        Cookie[] cookies = request.getCookies();
+
+        if (cookies != null) {
+            for (Cookie cookie : cookies) {
+                if ("access_token".equals(cookie.getName())) {
+                    return cookie.getValue();
+                }
+            }
+        }
+
+        return null;
     }
 }

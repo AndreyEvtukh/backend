@@ -1,13 +1,16 @@
 package com.portfolio.backend.service;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.RestClient;
 import org.springframework.web.client.RestClientResponseException;
 
 import java.util.Map;
 
+@Slf4j
 @Service
 public class ResendEmailService {
 
@@ -30,6 +33,7 @@ public class ResendEmailService {
                 .build();
     }
 
+    @Transactional(readOnly = true)
     public void send(
             String to,
             String subject,
@@ -53,10 +57,10 @@ public class ResendEmailService {
 
         } catch (RestClientResponseException e) {
 
-            System.err.println("========== RESEND ERROR ==========");
-            System.err.println("HTTP status: " + e.getStatusCode());
-            System.err.println("Response: " + e.getResponseBodyAsString());
-            System.err.println("==================================");
+            log.error("========== RESEND ERROR ==========");
+            log.error("HTTP status: " + e.getStatusCode());
+            log.error("Response: " + e.getResponseBodyAsString());
+            log.error("==================================");
 
             throw new IllegalStateException("Resend API error: " + e.getStatusCode() + " - " + e.getResponseBodyAsString(), e );
         }
