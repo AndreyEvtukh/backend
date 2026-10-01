@@ -1,275 +1,222 @@
 package com.portfolio.backend.service;
 
-import com.portfolio.backend.exceptions.EmailAlreadyRegisteredException;
-import com.portfolio.backend.exceptions.InputEmailErrorException;
-import com.portfolio.backend.exceptions.InputPasswordErrorException;
-import com.portfolio.backend.exceptions.InputSendMailErrorException;
-import com.portfolio.backend.jwt.JwtService;
-import com.portfolio.backend.model.User;
-import com.portfolio.backend.model.VerificationCode;
-import com.portfolio.backend.model.VerificationCode.Type;
+import com.portfolio.backend.dto.auth.register.RegisterInputDTO;
+import com.portfolio.backend.dto.auth.reset.ResetPasswordOutputDTO;
+import com.portfolio.backend.dto.auth.sendEmail.SendEmailInputDTO;
+import com.portfolio.backend.dto.auth.sendEmail.SendEmailOutputDTO;
+import com.portfolio.backend.dto.auth.verify.VerificationCodeDTO;
+import com.portfolio.backend.dto.auth.verify.VerifyOutputDTO;
+import com.portfolio.backend.exceptions.*;
+import com.portfolio.backend.entity.User;
+import com.portfolio.backend.entity.VerificationCode;
+import com.portfolio.backend.entity.VerificationCode.Type;
+import com.portfolio.backend.mappers.VerificationCodeMapper;
 import com.portfolio.backend.repository.UserRepository;
 import com.portfolio.backend.repository.VerificationCodeRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Transactional;
+import com.portfolio.backend.dto.auth.login.LoginOutputDTO;
 
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
-import java.util.Optional;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class AuthService {
 
     private final UserRepository userRepository;
-    private final VerificationCodeRepository codeRepository;
+    private final VerificationCodeRepository verificationCodeRepository;
+
     private final PasswordEncoder passwordEncoder;
     private final ResendEmailService emailService;
     private final JwtService jwtService;
+    private final VerificationCodeMapper verificationCodeMapper;
 
     private final SecureRandom random = new SecureRandom();
 
-    @Value("${app.verification-code-ttl-minutes:15}")
+    @Value("${app.verification-code-ttl-minutes:5}")
     private long codeTtlMinutes;
 
-    @Value("${app.frontend-url}")
-    private String frontendUrl;
+    /**
+     *
+     * @param email
+     * @param password
+     * @return
+     */
+    public LoginOutputDTO login(String email, String password) {
+        String normalizedEmail = email.trim().toLowerCase();
 
-    // -------------------------------------------------------------------------
-    // 1. РЕГИСТРАЦИЯ — шаг 1: запрос кода
-    // -------------------------------------------------------------------------
+        User user = userRepository
+                .findByEmail(normalizedEmail)
+                .orElseThrow(() -> new InputEmailErrorException(normalizedEmail));
 
-    @Transactional
-    public void requestRegistration(
-            String email,
-            String username,
-            String password
-    ) {
-        email = email.trim().toLowerCase();
+        if (!user.isRegistered()) {
+            throw new InputEmailErrorException(normalizedEmail);
+        }
 
-        Optional<User> existingUser = userRepository.findByEmail(email);
-        if (existingUser.isPresent() && existingUser.get().isRegistered()) {
-            throw new EmailAlreadyRegisteredException();
+        if (!passwordEncoder.matches(password, user.getPasswordHash())) {
+            throw new InputPasswordErrorException();
+        }
+
+        String token = jwtService.generateToken(user);
+
+        return new LoginOutputDTO(
+                token,
+                user.getId(),
+                user.getUsername(),
+                user.getRole(),
+                user.getEmail()
+        );
+    }
+
+    /**
+     *
+     * @param input
+     * @return
+     */
+    public VerificationCodeDTO register(RegisterInputDTO input) {
+        String email = input.email().trim().toLowerCase();
+        String username = input.username().trim();
+        String password = input.password();
+
+        log.info("Registration code requested for email: {}", email);
+
+        User existingUser = userRepository.findByEmail(email).orElse(null);
+        if (existingUser != null && existingUser.isRegistered()) {
+            throw new InputEmailAlreadyRegisteredException(email);
         }
 
         String code = generateSixDigitCode();
         String passwordHash = passwordEncoder.encode(password);
 
-        // Храним username + hash пароля до подтверждения email.
-        String payload = username + "\n" + passwordHash;
-
-        VerificationCode vc = new VerificationCode();
-
-        vc.setEmail(email);
-        vc.setCode(code);
-        vc.setType(Type.REGISTER);
-        vc.setPayload(payload);
-        vc.setExpiresAt(
+        VerificationCode verificationCode = new VerificationCode();
+        verificationCode.setEmail(email);
+        verificationCode.setCode(code);
+        verificationCode.setType(Type.REGISTER);
+        verificationCode.setUsername(username);
+        verificationCode.setPasswordHash(passwordHash);
+        verificationCode.setExpiresAt(
                 Instant.now().plus(codeTtlMinutes, ChronoUnit.MINUTES)
         );
-        vc.setUsed(false);
+        verificationCode.setUsed(false);
 
-        codeRepository.save(vc);
+        VerificationCode saved = verificationCodeRepository.save(verificationCode);
+
         try {
             emailService.send(
-                    email, "Код подтверждения регистрации",
+                    email,
+                    "Код подтверждения регистрации",
                     """
-                            Ваш код подтверждения: %s
-                            
-                            Код действует %d минут.
-                            
-                            Если вы не регистрировались, просто проигнорируйте это письмо.
-                            """
-                            .formatted(code, codeTtlMinutes)
+                    Ваш код подтверждения регистрации: %s
+                    
+                    Код действует %d минут.
+                    
+                    Если вы не регистрировались, просто проигнорируйте это письмо.
+                    """.formatted(code, codeTtlMinutes)
             );
+
+            return verificationCodeMapper.toDTO(saved);
+
         } catch (Exception e) {
+            log.error("Failed to send registration email to {}", email, e);
             throw new InputSendMailErrorException();
         }
     }
 
-    // -------------------------------------------------------------------------
-    // 1. РЕГИСТРАЦИЯ — шаг 2: подтверждение кода
-    // -------------------------------------------------------------------------
-
-    @Transactional
-    public String confirmRegistration(
-            String email,
-            String code
-    ) {
+    public VerifyOutputDTO verify(String email, String code) {
         email = email.trim().toLowerCase();
 
-        VerificationCode vc = codeRepository
+        VerificationCode verificationCode = verificationCodeRepository
                 .findFirstByEmailAndTypeAndUsedFalseOrderByCreatedAtDesc(email, Type.REGISTER)
-                .orElseThrow(() -> new IllegalArgumentException("Code not found"));
+                .orElseThrow(InputVerifyCodeErrorException::new);
 
-        if (vc.isUsed()) {
-            throw new IllegalArgumentException("Code already used");
-        }
+        if (verificationCode.isUsed()) throw new InputVerifyCodeUsedException();
+        if (verificationCode.getExpiresAt().isBefore(Instant.now())) throw new InputVerifyCodeExpiredException();
+        if (!verificationCode.getCode().equals(code.trim())) throw new InputVerifyCodeErrorException();
 
-        if (vc.getExpiresAt().isBefore(Instant.now())) {
-            throw new IllegalArgumentException("Code expired");
-        }
+        String username = verificationCode.getUsername();
+        String passwordHash = verificationCode.getPasswordHash();
 
-        if (!vc.getCode().equals(code.trim())) {
-            throw new IllegalArgumentException("Invalid code");
-        }
-
-        String payload = vc.getPayload();
-
-        if (payload == null || !payload.contains("\n")) {
-            throw new IllegalStateException("Invalid payload");
-        }
-
-        int separator = payload.indexOf('\n');
-
-        String username = payload.substring(0, separator);
-        String passwordHash = payload.substring(separator + 1);
-
-        User user = userRepository.findByEmail(email).orElseGet(User::new);
+        User user = userRepository
+                .findByEmail(email)
+                .orElseGet(User::new);
 
         user.setEmail(email);
         user.setUsername(username);
         user.setPasswordHash(passwordHash);
+        user.setRole("USER");
         user.setRegistered(true);
         user.setEnabled(true);
 
         userRepository.save(user);
 
-        vc.setUsed(true);
-        codeRepository.save(vc);
+        verificationCode.setUsed(true);
+        verificationCodeRepository.save(verificationCode);
 
-        return jwtService.generateToken(user);
+        String token = jwtService.generateToken(user);
+
+        return new VerifyOutputDTO(user.getId(), token, user.getUsername(), user.getRole(), user.getEmail());
     }
 
-    // -------------------------------------------------------------------------
-    // 2. ПРОВЕРКА EMAIL
-    // -------------------------------------------------------------------------
-
-    public boolean emailExists(String email) {
-        return userRepository
-                .findByEmail(email.trim().toLowerCase())
-                .map(User::isRegistered)
-                .orElse(false);
-    }
-
-    // -------------------------------------------------------------------------
-    // 3. ВОССТАНОВЛЕНИЕ ПАРОЛЯ — запрос
-    // -------------------------------------------------------------------------
-
-    @Transactional
-    public void requestPasswordReset(String email) {
-        email = email.trim().toLowerCase();
-
-        var userOpt = userRepository
-                .findByEmail(email)
-                .filter(User::isRegistered);
-
-        // Не раскрываем существование email
-        if (userOpt.isEmpty()) {
-            return;
-        }
-
-        String code = generateSixDigitCode();
-
-        VerificationCode vc = new VerificationCode();
-
-        vc.setEmail(email);
-        vc.setCode(code);
-        vc.setType(Type.RESET_PASSWORD);
-        vc.setExpiresAt(
-                Instant.now().plus(codeTtlMinutes, ChronoUnit.MINUTES)
-        );
-        vc.setUsed(false);
-
-        codeRepository.save(vc);
-
-        String link = frontendUrl + "/reset-password?email=" + email + "&code=" + code;
-
-        emailService.send(
-                email,
-                "Восстановление пароля",
-                """
-                        Код для смены пароля: %s
-                        
-                        Или перейдите по ссылке:
-                        %s
-                        
-                        Код действует %d минут.
-                        
-                        Если вы не запрашивали восстановление пароля,
-                        просто проигнорируйте это письмо.
-                        """.formatted(code, link, codeTtlMinutes)
+    public LoginOutputDTO emailExists(String email) {
+        User user = userRepository.findByEmail(email).orElseGet(User::new);
+        String token = jwtService.generateToken(user);
+        return new LoginOutputDTO(
+                token,
+                user.getId(),
+                user.getUsername(),
+                user.getRole(),
+                user.getEmail()
         );
     }
 
-    // -------------------------------------------------------------------------
-    // 3. ВОССТАНОВЛЕНИЕ ПАРОЛЯ — новый пароль
-    // -------------------------------------------------------------------------
-
-    @Transactional
-    public void resetPassword(
+    public ResetPasswordOutputDTO resetPassword(
             String email,
-            String code,
-            String newPassword
+            String password
     ) {
-        email = email.trim().toLowerCase();
-
-        VerificationCode vc = codeRepository
-                .findFirstByEmailAndTypeAndUsedFalseOrderByCreatedAtDesc(
-                        email,
-                        Type.RESET_PASSWORD
-                )
-                .orElseThrow(() ->
-                        new IllegalArgumentException("Code not found")
-                );
-
-        if (vc.getExpiresAt().isBefore(Instant.now())) {
-            throw new IllegalArgumentException("Code expired");
-        }
-
-        if (!vc.getCode().equals(code.trim())) {
-            throw new IllegalArgumentException("Invalid code");
-        }
+        String normalizedEmail = email.trim().toLowerCase();
 
         User user = userRepository
-                .findByEmail(email)
-                .orElseThrow(() ->
-                        new IllegalArgumentException("User not found")
-                );
+                .findByEmail(normalizedEmail)
+                .orElseThrow(() -> new InputEmailErrorException(normalizedEmail));
 
-        user.setPasswordHash(passwordEncoder.encode(newPassword));
-
-        userRepository.save(user);
-
-        vc.setUsed(true);
-        codeRepository.save(vc);
-    }
-
-    // -------------------------------------------------------------------------
-    // 4. ЛОГИН → JWT
-    // -------------------------------------------------------------------------
-
-    public String login(String email, String password_hash) {
-        User user = userRepository
-                .findByEmail(email.trim().toLowerCase())
-                .filter(User::isRegistered)
-                .orElseThrow(InputEmailErrorException::new);
-
-        if (!passwordEncoder.matches(password_hash, user.getPasswordHash())) {
-//            throw new IllegalArgumentException("Invalid credentials pass");
-            throw new InputPasswordErrorException();
+        if (!user.isRegistered()) {
+            throw new InputEmailErrorException(normalizedEmail);
         }
 
-        return jwtService.generateToken(user);
+        String passwordHash = passwordEncoder.encode(password);
+        user.setPasswordHash(passwordHash);
+
+        User saved = userRepository.save(user);
+        return new ResetPasswordOutputDTO(true);
     }
 
-    // -------------------------------------------------------------------------
-    // Генерация 6-значного кода
-    // -------------------------------------------------------------------------
+    public SendEmailOutputDTO sendEmail(
+            String userName,
+            String email,
+            String message
+    ) {
+        String normalizedEmail = email.trim().toLowerCase();
+
+        try {
+            emailService.send(
+                    "andrey.evtukh@gmail.com",
+                    "Portfolio contact from: %s, <%s>".formatted(userName, normalizedEmail),
+                    message
+            );
+
+            return new SendEmailOutputDTO(true);
+
+        } catch (Exception e) {
+            log.error("Failed to send contact email from {}", normalizedEmail, e);
+            throw new InputSendMailErrorException();
+        }
+    }
 
     private String generateSixDigitCode() {
         int n = random.nextInt(1_000_000);

@@ -1,12 +1,16 @@
-FROM eclipse-temurin:21-jdk AS build
-WORKDIR /app
-COPY . .
-RUN chmod +x mvnw
+FROM eclipse-temurin:21-jdk
 
-RUN ./mvnw clean package -DskipTests
-
-FROM eclipse-temurin:21-jre
 WORKDIR /app
-COPY --from=build /app/target/*.jar app.jar
-EXPOSE 8080
-ENTRYPOINT ["java", "-jar", "app.jar"]
+
+COPY gradlew .
+COPY gradle gradle
+COPY build.gradle.kts .
+COPY settings.gradle.kts .
+
+RUN ./gradlew dependencies --no-daemon
+
+COPY src src
+
+RUN ./gradlew bootJar --no-daemon
+
+CMD ["java", "-jar", "build/libs/portfolio-java-spring-1.0.1.jar"]

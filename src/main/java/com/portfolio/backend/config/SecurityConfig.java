@@ -26,11 +26,6 @@ public class SecurityConfig {
     private final JwtAuthFilter jwtAuthFilter;
 
     @Bean
-    public PasswordEncoder passwordEncoder() {
-        return new BCryptPasswordEncoder();
-    }
-
-    @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) {
         http
                 .csrf(AbstractHttpConfigurer::disable)
@@ -40,14 +35,13 @@ public class SecurityConfig {
                         .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
 
                         .requestMatchers(
-                                "/api/auth/**",
-                                "/api/users",
-                                "/api/graphql",
-                                "/api/graphiql",
-                                "/api/graphiql/**",
-                                "/api/vendor/**"
+                                "/api/v1/auth/**",
+                                "/api/v1/users",
+                                "/api/v1/graphql",
+                                "/api/v1/graphiql",
+                                "/api/v1/graphiql/**",
+                                "/api/v1/vendor/**"
                         ).permitAll()
-                        // Все остальные запросы требуют аутентификации (JWT)
                         .anyRequest().permitAll()
                 )
                 .addFilterBefore(jwtAuthFilter, UsernamePasswordAuthenticationFilter.class);
@@ -58,11 +52,10 @@ public class SecurityConfig {
     @Bean
     public CorsConfigurationSource corsConfigurationSource() {
 
-        CorsConfiguration configuration =
-                new CorsConfiguration();
+        CorsConfiguration configuration = new CorsConfiguration();
 
         configuration.setAllowedOrigins(List.of(
-                "http://localhost:4200",
+                "http://localhost:4202",
                 "http://localhost:3000",
                 "http://localhost:3005",
 
@@ -71,9 +64,9 @@ public class SecurityConfig {
         ));
 
         configuration.setAllowedMethods(List.of(
-                "GET",
-                "POST",
-                "OPTIONS"
+                HttpMethod.GET.name(),
+                HttpMethod.POST.name(),
+                HttpMethod.OPTIONS.name()
         ));
 
         configuration.setAllowedHeaders(List.of(
@@ -85,11 +78,14 @@ public class SecurityConfig {
         ));
 
         configuration.setAllowCredentials(true);
-
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();
-
         source.registerCorsConfiguration("/**", configuration);
 
         return source;
+    }
+
+    @Bean
+    public PasswordEncoder passwordEncoder() {
+        return new BCryptPasswordEncoder();
     }
 }
