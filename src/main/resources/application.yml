@@ -3,12 +3,9 @@ spring:
     name: backend
 
   datasource:
-    url: jdbc:postgresql://ep-damp-violet-ax1b2bk1-pooler.c-4.us-east-2.aws.neon.tech:5432/neondb?sslmode=require&channel_binding=require
+    url: ${DB_URL}
     username: ${DB_USER}
     password: ${DB_PASSWORD}
-#    url: jdbc:postgresql://localhost:5432/portfolio_db
-#    username: postgres
-#    password: postgres
     driver-class-name: org.postgresql.Driver
 
   jpa:
@@ -27,36 +24,17 @@ spring:
     graphiql:
       enabled: true
       path: /api/v1/graphiql
-    cors:
-      allowed-origins:
-        - http://localhost:3000
-        - http://localhost:4042
-        - https://dev.andrey-evtukh.vercel.app
-        - https://andrey-evtukh.vercel.app
-      allowed-methods:
-        - GET
-        - POST
-        - OPTIONS
-      allowed-headers: "*"
-      allow-credentials: true
 
 server:
-  port: 8082
+  port: ${PORT:8082}
 
 resend:
   api-key: ${RESEND_API_KEY}
   from: ${MAIL_FROM:andrey.evtukh@gmail.com}
 
 jwt:
-  secret: ${JWT_SECRET:436a2692f8e7fb78240068bb110d87f5222a8486c7f98fd06884e71a2b3178c9}
+  secret: ${JWT_SECRET}
   expiration-ms: 3600000
 
 app:
-  frontend-url: http://localhost:3000
   verification-code-ttl-minutes: 5
-
-logging:
-  level:
-    org.springframework.graphql: DEBUG
-    org.springframework.web: DEBUG
-    org.springframework.http: TRACE

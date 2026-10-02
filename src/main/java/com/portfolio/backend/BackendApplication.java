@@ -1,17 +1,24 @@
 package com.portfolio.backend;
 
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.context.ApplicationContext;
 
+@Slf4j
 @SpringBootApplication
 public class BackendApplication {
 
     public static void main(String[] args) {
-        System.out.println("DB_USER=" + System.getenv("DB_USER"));
-        System.out.println("DB_PASSWORD=" + System.getenv("DB_PASSWORD"));
-        System.out.println("RESEND_API_KEY=" + System.getenv("RESEND_API_KEY"));
+        log.info("DB_USER configured: " + isConfigured("DB_USER"));
+        log.info("DB_PASSWORD configured: " + isConfigured("DB_PASSWORD"));
+        log.info("RESEND_API_KEY configured: " + isConfigured("RESEND_API_KEY"));
 
         ApplicationContext context = SpringApplication.run(com.portfolio.backend.BackendApplication.class, args);
+    }
+
+    private static boolean isConfigured(String name) {
+        String value = System.getenv(name);
+        return value != null && !value.isBlank();
     }
 }
