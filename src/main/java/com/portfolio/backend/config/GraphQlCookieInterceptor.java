@@ -1,6 +1,7 @@
 package com.portfolio.backend.config;
 
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.graphql.server.WebGraphQlInterceptor;
 import org.springframework.graphql.server.WebGraphQlRequest;
 import org.springframework.graphql.server.WebGraphQlResponse;
@@ -14,6 +15,12 @@ import java.time.Duration;
 @Slf4j
 @Component
 public class GraphQlCookieInterceptor implements WebGraphQlInterceptor {
+
+    @Value("${app.cookie.secure}")
+    private boolean cookieSecure;
+
+    @Value("${app.cookie.same-site}")
+    private String cookieSameSite;
 
     @Override
     public Mono<WebGraphQlResponse> intercept(
@@ -35,10 +42,10 @@ public class GraphQlCookieInterceptor implements WebGraphQlInterceptor {
                                         token
                                 )
                                 .httpOnly(true)
-                                .secure(false)
+                                .secure(cookieSecure)
                                 .path("/")
                                 .maxAge(Duration.ofDays(1))
-                                .sameSite("Lax")
+                                .sameSite(cookieSameSite)
                                 .build();
 
                         response.getResponseHeaders().add(
@@ -56,16 +63,16 @@ public class GraphQlCookieInterceptor implements WebGraphQlInterceptor {
                                         ""
                                 )
                                 .httpOnly(true)
-                                .secure(false)
+                                .secure(cookieSecure)
                                 .path("/")
                                 .maxAge(Duration.ZERO)
-                                .sameSite("Lax")
+                                .sameSite(cookieSameSite)
                                 .build();
 
-                        response
-                                .getResponseHeaders()
-                                .add(HttpHeaders.SET_COOKIE, cookie.toString()
-                                );
+                        response.getResponseHeaders().add(
+                                HttpHeaders.SET_COOKIE,
+                                cookie.toString()
+                        );
 
                         log.info("=> Clear access token [SUCCESS]");
                     }
