@@ -16,10 +16,11 @@ import java.time.Duration;
 @Component
 public class GraphQlCookieInterceptor implements WebGraphQlInterceptor {
 
-    @Value("${app.cookie.secure}")
+    @Value("${app.cookie.secure:false}")
     private boolean cookieSecure;
 
-    @Value("${app.cookie.same-site}")
+    @Value("${app.cookie.same-site:Lax}")
+
     private String cookieSameSite;
 
     @Override
