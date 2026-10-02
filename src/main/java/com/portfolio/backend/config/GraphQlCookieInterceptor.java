@@ -20,6 +20,7 @@ public class GraphQlCookieInterceptor implements WebGraphQlInterceptor {
     private boolean cookieSecure;
 
     @Value("${app.cookie.same-site:Lax}")
+
     private String cookieSameSite;
 
     @Override
