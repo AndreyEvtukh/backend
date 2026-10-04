@@ -40,12 +40,18 @@ dependencies {
     implementation("io.jsonwebtoken:jjwt-api:0.13.0")
     implementation("io.jsonwebtoken:jjwt-jackson:0.13.0")
 
+    implementation("org.springframework.boot:spring-boot-starter-webflux")
+
+    implementation("org.eclipse.angus:angus-mail:2.0.4")
+    implementation("jakarta.mail:jakarta.mail-api:2.1.3")
+    implementation("org.springframework.boot:spring-boot-starter-mail")
+
     // MapStruct
     implementation("org.mapstruct:mapstruct:1.6.3")
     annotationProcessor("org.mapstruct:mapstruct-processor:1.6.3")
 
     // Swagger
-    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${openapiVersion}")
+//    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:${openapiVersion}")
 
     // Lombok
     compileOnly("org.projectlombok:lombok")
@@ -53,10 +59,10 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok-mapstruct-binding:0.2.0")
 
     // Tests
-    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
-    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
+//    testImplementation("org.springframework.boot:spring-boot-starter-data-jpa-test")
+//    testImplementation("org.springframework.boot:spring-boot-starter-flyway-test")
+//    testImplementation("org.springframework.boot:spring-boot-starter-security-test")
+//    testImplementation("org.springframework.boot:spring-boot-starter-webmvc-test")
 
     testCompileOnly("org.projectlombok:lombok")
     testAnnotationProcessor("org.projectlombok:lombok")
