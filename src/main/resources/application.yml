@@ -1,3 +1,4 @@
+#  pk_WvaXhb_05ae0d02175b380b0aa5b3cb30fe617db7
 spring:
   application:
     name: backend
@@ -25,12 +26,20 @@ spring:
       enabled: true
       path: /api/v1/graphiql
 
+  mail:
+    host: smtp.gmail.com
+    port: 587
+    username: andrey.evtukh@gmail.com
+    password: oukewvyempdhydzw
+    properties:
+      mail:
+        smtp:
+          auth: true
+          starttls:
+            enable: true
+
 server:
   port: ${PORT:8082}
-
-resend:
-  api-key: ${RESEND_API_KEY}
-  from: ${MAIL_FROM:andrey.evtukh@gmail.com}
 
 jwt:
   secret: ${JWT_SECRET}

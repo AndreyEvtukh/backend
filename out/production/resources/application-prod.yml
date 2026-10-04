@@ -1,0 +1,23 @@
+spring:
+  config:
+    activate:
+      on-profile: prod
+
+  graphql:
+    cors:
+      allowed-origins:
+        - https://andrey-evtukh.vercel.app
+        - https://dev.andrey-evtukh.vercel.app
+      allowed-methods:
+        - GET
+        - POST
+        - OPTIONS
+      allowed-headers: "*"
+      allow-credentials: true
+
+app:
+  frontend-url: https://andrey-evtukh.vercel.app
+
+  cookie:
+    secure: true
+    same-site: None

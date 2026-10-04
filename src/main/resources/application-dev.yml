@@ -3,17 +3,15 @@ spring:
     activate:
       on-profile: dev
 
-  datasource:
-    url: jdbc:postgresql://localhost:5432/portfolio_db
-    username: postgres
-    password: postgres
+#  datasource:
+#    url: jdbc:postgresql://localhost:5432/portfolio_db
+#    username: postgres
+#    password: postgres
 
   graphql:
     cors:
       allowed-origins:
         - http://localhost:3000
-        - http://localhost:4042
-        - http://localhost:4302
       allowed-methods:
         - GET
         - POST
@@ -25,7 +23,7 @@ server:
   port: 8082
 
 app:
-  frontend-url: http://localhost:4302
+  frontend-url: http://localhost:3000
 
   cookie:
     secure: false

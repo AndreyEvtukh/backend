@@ -2,7 +2,7 @@ package com.portfolio.backend.service;
 
 import com.portfolio.backend.dto.auth.register.RegisterInputDTO;
 import com.portfolio.backend.dto.auth.reset.ResetPasswordOutputDTO;
-import com.portfolio.backend.dto.auth.sendEmail.SendEmailInputDTO;
+//import com.portfolio.backend.dto.auth.sendEmail.SendEmailInputDTO;
 import com.portfolio.backend.dto.auth.sendEmail.SendEmailOutputDTO;
 import com.portfolio.backend.dto.auth.verify.VerificationCodeDTO;
 import com.portfolio.backend.dto.auth.verify.VerifyOutputDTO;
@@ -13,6 +13,7 @@ import com.portfolio.backend.entity.VerificationCode.Type;
 import com.portfolio.backend.mappers.VerificationCodeMapper;
 import com.portfolio.backend.repository.UserRepository;
 import com.portfolio.backend.repository.VerificationCodeRepository;
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -23,6 +24,7 @@ import com.portfolio.backend.dto.auth.login.LoginOutputDTO;
 import java.security.SecureRandom;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
+import java.util.Locale;
 
 @Slf4j
 @Service
@@ -33,7 +35,7 @@ public class AuthService {
     private final VerificationCodeRepository verificationCodeRepository;
 
     private final PasswordEncoder passwordEncoder;
-    private final ResendEmailService emailService;
+    private final EmailService emailService;
     private final JwtService jwtService;
     private final VerificationCodeMapper verificationCodeMapper;
 
@@ -79,17 +81,23 @@ public class AuthService {
      * @param input
      * @return
      */
+    @Transactional
     public VerificationCodeDTO register(RegisterInputDTO input) {
-        String email = input.email().trim().toLowerCase();
+        String email = input.email().trim().toLowerCase(Locale.ROOT);
         String username = input.username().trim();
         String password = input.password();
 
-        log.info("Registration code requested for email: {}", email);
+        log.info("=> Registration code requested for email: {}", email);
 
-        User existingUser = userRepository.findByEmail(email).orElse(null);
+        User existingUser = userRepository
+                .findByEmail(email)
+                .orElse(null);
+
         if (existingUser != null && existingUser.isRegistered()) {
             throw new InputEmailAlreadyRegisteredException(email);
         }
+
+        verificationCodeRepository.invalidateActiveCodes(email, Type.REGISTER);
 
         String code = generateSixDigitCode();
         String passwordHash = passwordEncoder.encode(password);
@@ -108,24 +116,18 @@ public class AuthService {
         VerificationCode saved = verificationCodeRepository.save(verificationCode);
 
         try {
-            emailService.send(
+            emailService.sendVerificationCode(email, code);
+        } catch (Exception e) {
+            log.error(
+                    "Failed to send registration email to {}",
                     email,
-                    "Код подтверждения регистрации",
-                    """
-                    Ваш код подтверждения регистрации: %s
-                    
-                    Код действует %d минут.
-                    
-                    Если вы не регистрировались, просто проигнорируйте это письмо.
-                    """.formatted(code, codeTtlMinutes)
+                    e
             );
 
-            return verificationCodeMapper.toDTO(saved);
-
-        } catch (Exception e) {
-            log.error("Failed to send registration email to {}", email, e);
             throw new InputSendMailErrorException();
         }
+
+        return verificationCodeMapper.toDTO(saved);
     }
 
     public VerifyOutputDTO verify(String email, String code) {
@@ -204,12 +206,7 @@ public class AuthService {
         String normalizedEmail = email.trim().toLowerCase();
 
         try {
-            emailService.send(
-                    "andrey.evtukh@gmail.com",
-                    "Portfolio contact from: %s, <%s>".formatted(userName, normalizedEmail),
-                    message
-            );
-
+            emailService.sendMessage(userName, normalizedEmail, message);
             return new SendEmailOutputDTO(true);
 
         } catch (Exception e) {
