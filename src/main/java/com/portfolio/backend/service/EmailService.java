@@ -45,6 +45,7 @@ public class EmailService {
 
             mailSender.send(message);
         } catch (MessagingException e) {
+            log.error("MessagingException while sending email", e);
             throw new IllegalStateException("Failed to send verification email", e);
         }
     }
@@ -77,6 +78,7 @@ public class EmailService {
             mailSender.send(mail);
 
         } catch (MessagingException e) {
+            log.error("MessagingException while sending email", e);
             throw new IllegalStateException("Failed to send portfolio contact email", e);
         }
     }
