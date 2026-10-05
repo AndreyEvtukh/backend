@@ -6,3 +6,6 @@ target/
 .env
 /.mvn/
 /.idea/
+/gradle/
+/build/
+/.gradle/
