@@ -33,6 +33,7 @@ spring:
     password: ${BREVO_SMTP_KEY}
     properties:
       mail:
+        debug: true
         smtp:
           auth: true
           starttls:
