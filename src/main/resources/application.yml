@@ -26,20 +26,12 @@ spring:
       enabled: true
       path: /api/v1/graphiql
 
-  mail:
-    host: smtp-relay.brevo.com
-    port: 587
-    username: ${BREVO_SMTP_LOGIN}
-    password: ${BREVO_SMTP_KEY}
-    properties:
-      mail:
-        debug: true
-        smtp:
-          auth: true
-          starttls:
-            enable: true
 mail:
-  from: andrey.evtukh@gmail.com
+  from: ${MAIL_FROM:andrey.evtukh@gmail.com}
+  from-name: ${MAIL_FROM_NAME:Andrey Evtukh}
+
+brevo:
+  api-key: ${BREVO_API_KEY}
 
 server:
   port: ${PORT:8082}
