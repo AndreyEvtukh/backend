@@ -1,83 +1,176 @@
 package com.portfolio.backend.service;
 
-import jakarta.mail.MessagingException;
-import jakarta.mail.internet.MimeMessage;
-import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.mail.javamail.JavaMailSender;
-import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.http.MediaType;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestClient;
+
+import java.util.List;
 
 @Slf4j
 @Service
-@RequiredArgsConstructor
 public class EmailService {
 
-    private final JavaMailSender mailSender;
+    private static final String BREVO_API_URL =
+            "https://api.brevo.com/v3/smtp/email";
 
-    @Value("${mail.from}")
-    private String from;
+    private final RestClient restClient;
 
-    public void sendVerificationCode(String email, String code) {
-        try {
-            MimeMessage message = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
+    private final String apiKey;
+    private final String from;
+    private final String fromName;
 
-            helper.setFrom(from);
-            helper.setTo(email);
-            helper.setSubject("Your verification code");
+    public EmailService(
+            @Value("${brevo.api-key}") String apiKey,
+            @Value("${mail.from}") String from,
+            @Value("${mail.from-name:Andrey Evtukh}") String fromName
+    ) {
+        this.apiKey = apiKey;
+        this.from = from;
+        this.fromName = fromName;
 
-            helper.setText(
-                    """
-                            <html>
-                                <body>
-                                    <h2>Email verification</h2>
-                                    <p>Your verification code is:</p>
-                                    <h1>%s</h1>
-                                    <p>This code will expire in 5 minutes.</p>
-                                    <p>If you did not request this code, you can ignore this email.</p>
-                                </body>
-                            </html>
-                            """.formatted(code),
-                    true
-            );
-
-            mailSender.send(message);
-        } catch (MessagingException e) {
-            throw new IllegalStateException("Failed to send verification email", e);
-        }
+        this.restClient = RestClient.builder()
+                .baseUrl(BREVO_API_URL)
+                .build();
     }
 
+    /**
+     * Sends registration verification code.
+     */
+    public void sendVerificationCode(
+            String email,
+            String code
+    ) {
+        String subject = "Your Portfolio verification code";
+
+        String text = """
+                Hello,
+
+                Your verification code is: %s
+
+                This code will expire in 5 minutes.
+
+                If you did not request this code, you can safely ignore this email.
+
+                Best regards,
+                Andrey Evtukh
+                """.formatted(code);
+
+        log.info("=== Brevo verification email: START ===");
+        log.info("From: {} <{}>", fromName, from);
+        log.info("To: {}", email);
+        log.info("Subject: {}", subject);
+        log.info("Verification code: {}", code);
+
+        send(
+                email,
+                null,
+                subject,
+                text
+        );
+
+        log.info("=== Brevo verification email: SUCCESS ===");
+    }
+
+    /**
+     * Sends contact form message.
+     *
+     * The visitor's email is used as Reply-To,
+     * while the message itself is sent to the portfolio owner's email.
+     */
     public void sendMessage(
             String userName,
             String email,
             String text
     ) {
+        String subject = "[Portfolio] Contact from: %s <%s>"
+                .formatted(userName, email);
+
+        log.info("=== Brevo contact email: START ===");
+        log.info("From: {} <{}>", fromName, from);
+        log.info("Reply-To: {}", email);
+        log.info("To: {}", from);
+        log.info("Subject: {}", subject);
+        log.info("Message length: {}", text != null ? text.length() : 0);
+
+        send(
+                from,
+                new ReplyTo(email, userName),
+                subject,
+                text
+        );
+
+        log.info("=== Brevo contact email: SUCCESS ===");
+    }
+
+    private void send(
+            String recipient,
+            ReplyTo replyTo,
+            String subject,
+            String text
+    ) {
+        BrevoEmailRequest request = new BrevoEmailRequest(
+                new Sender(fromName, from),
+                List.of(new Recipient(recipient)),
+                replyTo,
+                subject,
+                text
+        );
+
         try {
-            MimeMessage mail = mailSender.createMimeMessage();
-            MimeMessageHelper helper = new MimeMessageHelper(mail, true, "UTF-8");
+            BrevoEmailResponse response = restClient.post()
+                    .contentType(MediaType.APPLICATION_JSON)
+                    .accept(MediaType.APPLICATION_JSON)
+                    .header("api-key", apiKey)
+                    .body(request)
+                    .retrieve()
+                    .body(BrevoEmailResponse.class);
 
-            log.info("=== Portfolio contact email: START ===");
-            log.info("User name: {}", userName);
-            log.info("User email: {}", email);
-            log.info("From: {}", from);
-            log.info("Reply-To: {}", email);
-            log.info("To: {}", from);
-            log.info("Subject: [Portfolio] Contact from: {} <{}>", userName, email);
-            log.info("Message length: {}", text != null ? text.length() : 0);
-            log.debug("Message text: {}", text);
+            String messageId = response != null
+                    ? response.messageId()
+                    : null;
 
-            helper.setFrom(from);
-            helper.setReplyTo(email);
-            helper.setTo(from);
-            helper.setSubject("[Portfolio] Contact from: %s <%s>".formatted(userName, email));
-            helper.setText(text);
+            log.info("Brevo API accepted email");
+            log.info("Brevo messageId: {}", messageId);
 
-            mailSender.send(mail);
-
-        } catch (MessagingException e) {
-            throw new IllegalStateException("Failed to send portfolio contact email", e);
+        } catch (Exception e) {
+            log.error("Brevo API email sending failed", e);
+            throw new IllegalStateException(
+                    "Failed to send email via Brevo API",
+                    e
+            );
         }
+    }
+
+    private record BrevoEmailRequest(
+            Sender sender,
+            List<Recipient> to,
+            ReplyTo replyTo,
+            String subject,
+            String textContent
+    ) {
+    }
+
+    private record Sender(
+            String name,
+            String email
+    ) {
+    }
+
+    private record Recipient(
+            String email
+    ) {
+    }
+
+    private record ReplyTo(
+            String email,
+            String name
+    ) {
+    }
+
+    private record BrevoEmailResponse(
+            String messageId
+    ) {
     }
 }
