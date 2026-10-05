@@ -58,6 +58,16 @@ public class EmailService {
             MimeMessage mail = mailSender.createMimeMessage();
             MimeMessageHelper helper = new MimeMessageHelper(mail, true, "UTF-8");
 
+            log.info("=== Portfolio contact email: START ===");
+            log.info("User name: {}", userName);
+            log.info("User email: {}", email);
+            log.info("From: {}", from);
+            log.info("Reply-To: {}", email);
+            log.info("To: {}", from);
+            log.info("Subject: [Portfolio] Contact from: {} <{}>", userName, email);
+            log.info("Message length: {}", text != null ? text.length() : 0);
+            log.debug("Message text: {}", text);
+
             helper.setFrom(from);
             helper.setReplyTo(email);
             helper.setTo(from);
