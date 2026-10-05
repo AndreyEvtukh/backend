@@ -3,27 +3,28 @@ package com.portfolio.backend.service;
 import jakarta.mail.MessagingException;
 import jakarta.mail.internet.MimeMessage;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.mail.javamail.JavaMailSender;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 
+@Slf4j
 @Service
 @RequiredArgsConstructor
 public class EmailService {
 
     private final JavaMailSender mailSender;
 
-    @Value("${spring.mail.username}")
+    @Value("${mail.from}")
     private String from;
 
     public void sendVerificationCode(String email, String code) {
         try {
             MimeMessage message = mailSender.createMimeMessage();
-
             MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
 
-            helper.setFrom("no-reply@andrey-evtukh.vercel.app");
+            helper.setFrom(from);
             helper.setTo(email);
             helper.setSubject("Your verification code");
 
@@ -43,28 +44,30 @@ public class EmailService {
             );
 
             mailSender.send(message);
-
         } catch (MessagingException e) {
-            throw new IllegalStateException("Failed to create verification email", e);
+            throw new IllegalStateException("Failed to send verification email", e);
         }
     }
 
-    public void sendMessage(String userName, String email, String text) {
+    public void sendMessage(
+            String userName,
+            String email,
+            String text
+    ) {
         try {
-            MimeMessage message = mailSender.createMimeMessage();
+            MimeMessage mail = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mail, true, "UTF-8");
 
-            MimeMessageHelper helper = new MimeMessageHelper(message, true, "UTF-8");
-
-            helper.setFrom("no-reply@andrey-evtukh.vercel.app");
+            helper.setFrom(from);
+            helper.setReplyTo(email);
             helper.setTo(from);
-            helper.setSubject("[no-reply] Portfolio contact from: %s, <%s>".formatted(userName, email));
+            helper.setSubject("[Portfolio] Contact from: %s <%s>".formatted(userName, email));
+            helper.setText(text);
 
-            helper.setText(String.valueOf(text), true);
-
-            mailSender.send(message);
+            mailSender.send(mail);
 
         } catch (MessagingException e) {
-            throw new IllegalStateException("Failed to create verification email", e);
+            throw new IllegalStateException("Failed to send portfolio contact email", e);
         }
     }
 }
