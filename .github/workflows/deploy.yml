@@ -52,7 +52,7 @@ jobs:
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           script: |
-            sha256sum /home/andrey_evtukh/apps/backend/portfolio-java-spring-1.0.1.jar
+            find /home/andrey_evtukh/apps/backend -maxdepth 4 -type f -name "*.jar" -ls  
 
       - name: Deploy
         uses: appleboy/ssh-action@v1
