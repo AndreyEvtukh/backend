@@ -44,6 +44,7 @@ jobs:
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           source: build/libs/portfolio-java-spring-1.0.1.jar
           target: /home/andrey_evtukh/apps/backend/
+          strip_components: 2
 
       - name: Verify JAR on VM
         uses: appleboy/ssh-action@v1
@@ -52,7 +53,8 @@ jobs:
           username: ${{ secrets.GCP_USER }}
           key: ${{ secrets.GCP_SSH_PRIVATE_KEY }}
           script: |
-            find /home/andrey_evtukh/apps/backend -maxdepth 4 -type f -name "*.jar" -ls  
+            test -f /home/andrey_evtukh/apps/backend/portfolio-java-spring-1.0.1.jar
+            sha256sum /home/andrey_evtukh/apps/backend/portfolio-java-spring-1.0.1.jar  
 
       - name: Deploy
         uses: appleboy/ssh-action@v1
